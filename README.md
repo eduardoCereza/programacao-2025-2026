@@ -1,9 +1,9 @@
-<<<<<<< HEAD
+
 ## Welcome to the Offical Pedro Pathing Quickstart!  
 
 Follow the steps on our [website](https://pedropathing.com/) to tune and setup!  
 Feel Free to reach out on the [Offical Pedro Pathing Discord Server](https://discord.gg/2GfC4qBP5s)!
-=======
+
 ## Please Switch to the goBILDA-Odometry-Driver Branch to use this reository. The master branch contains only the FTC SDK.
 
 ## NOTICE
@@ -19,11 +19,14 @@ commonly associated with Dead Wheel Odometry systems. It reads two encoders, and
 system of sensors to determine the robot's current heading, X position, and Y position.
 
 ## How to use? 
-<<<<<<< HEAD
+
 If you are already an Android Studio team, and are using git, you can add this repo as a git remote, and this will allow you to easily pull just the three files which this repo adds to the SDK. GoBildaPinpointDriver, SensorGoBildaPinpointExample, and Pose2D. You can add a remote to Android Studio by going to Git, then Manage Remotes in the navigation bar. Once you've added this Remote, click on the branch icon near the name of your curent project and find the new remote. There should be a branch called "goBILDA-Odometry-Driver", select that, and select "Pull into (yourbranch) using merge". There may be a conflict with the readme file, just accept your's. And you'll be off to the races!
-=======
+
 If you are already an Android Studio team, and are using git, you can add this repo as a git remote, and this will allow you to easily pull just the three files which this repo adds to the SDK. GoBildaPinpointDriver, SensorGoBildaPinpointExample, and Pose2D. You can add a remote to Android Studio by going to Git, then Manage Remotes in the navigation bar.
->>>>>>> 29b2a43 (Update README.md)
+
+
+If you are already an Android Studio team, and are using git, you can add this repo as a git remote, and this will allow you to easily pull just the three files which this repo adds to the SDK. GoBildaPinpointDriver, SensorGoBildaPinpointExample, and Pose2D. You can add a remote to Android Studio by going to Git, then Manage Remotes in the navigation bar. Once you've added this Remote, click on the branch icon near the name of your curent project and find the new remote. There should be a branch called "goBILDA-Odometry-Driver", select that, and select "Pull into (yourbranch) using merge. There may be a conflict with the readme file, just accept your's. And you'll be off to the races!
+
 
 If you do not already have a github project for your team/season, you can clone this repository. Just make sure to note that only the branch titled "goBILDA-Odometry-Driver" has the driver and example files.
 
@@ -1580,4 +1583,4 @@ Changes include:
  * The API for the Legacy Module and Core Device Interface Module have been updated.
    - Support for encoders with the Legacy Module is now working.
  * The hardware loop has been updated for better performance.
->>>>>>> 0c59285 (Update README.md)
+
