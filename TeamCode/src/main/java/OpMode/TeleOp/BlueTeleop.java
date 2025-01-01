@@ -10,16 +10,19 @@ import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
+import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.hardware.TouchSensor;
 import com.qualcomm.robotcore.util.ElapsedTime;
+
 import OpMode.TeleOp.Subsystems.GamePieceDetection;
+import OpMode.TeleOp.Subsystems.IntakeServos;
+import OpMode.TeleOp.Subsystems.ExtendoServos;
+
 import com.pedropathing.follower.Follower;
 import com.pedropathing.localization.Pose;
-import  com.qualcomm.robotcore.eventloop.opmode.OpMode;
-import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+
 import pedroPathing.constants.FConstants;
 import pedroPathing.constants.LConstants;
-
 
 @Config
 @TeleOp(name = "BlueTeleop", group = "Active")
@@ -35,24 +38,32 @@ public class BlueTeleop extends OpMode {
     private DcMotorEx slidemotorleft;
 
     private Follower follower;
-    private final Pose startPose = new Pose(0,0,0);
+    private final Pose startPose = new Pose(0, 0, 0);
     private FtcDashboard dashboard;
 
     // REV Touch Sensor (Limit Switch)
-    private TouchSensor limitSwitch;  // Declare the touch sensor
-    private boolean limitSwitchPreviouslyPressed = false; // if the limit switch was already pressed
+    private TouchSensor limitSwitch;
+    private boolean limitSwitchPreviouslyPressed = false;
 
-    //Intake
-    private DcMotor intakemotor; // intake motor
-    private ColorSensor colorSensor; // intake color sensor
-    private GamePieceDetection gamePieceDetection; // code to detect color
-    private boolean hasRumbled = false; // Flag to track if rumble has been
+    // Intake and Extendo Servos
+    private Servo intakeServoRight;
+    private Servo intakeServoLeft;
+    private IntakeServos intakeServos; // Intake subsystem instance
+    private Servo extendoServoRight;
+    private Servo extendoServoLeft;
+    private ExtendoServos extendoServos;
 
-    // Loop Time
+    // Intake Motor and Color Sensor
+    private DcMotor intakemotor;
+    private ColorSensor colorSensor;
+    private GamePieceDetection gamePieceDetection;
+    private boolean hasRumbled = false;
+
+    // Loop Timer
     private ElapsedTime loopTimer;
-
-
-
+    // Declare the timer for the extendo servo retraction
+    private ElapsedTime retractTimer = new ElapsedTime();
+    private boolean isRetracting = false;
 
     @Override
     public void init() {
@@ -65,10 +76,12 @@ public class BlueTeleop extends OpMode {
         // Initialize Viper Slide
         controller = new PIDController(p, i, d);
         telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
-        // Pedro TeleOp
+
+        // Initialize Pedro follower
         follower = new Follower(hardwareMap, FConstants.class, LConstants.class);
         follower.setStartingPose(startPose);
 
+        // Initialize slide motors
         slidemotorleft = hardwareMap.get(DcMotorEx.class, "slidemotorleft");
         slidemotorleft.setDirection(DcMotorSimple.Direction.REVERSE);
         slidemotorleft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
@@ -81,70 +94,90 @@ public class BlueTeleop extends OpMode {
         // Initialize Dashboard
         dashboard = FtcDashboard.getInstance();
 
-        // Initialize REV Touch Sensor (Limit Switch)
-        limitSwitch = hardwareMap.get(TouchSensor.class, "limitSwitch"); // Assign the touch sensor
+        // Initialize REV Touch Sensor
+        limitSwitch = hardwareMap.get(TouchSensor.class, "limitSwitch");
 
         // Initialize motors and sensors
         intakemotor = hardwareMap.get(DcMotor.class, "intakemotor");
         colorSensor = hardwareMap.get(ColorSensor.class, "colorSensor");
 
-        // Initialize GamePieceDetection
-        gamePieceDetection = new GamePieceDetection(colorSensor);
+        // Initialize intake servos
+        intakeServoRight = hardwareMap.get(Servo.class, "IntakeServoRight");
+        intakeServoLeft = hardwareMap.get(Servo.class, "IntakeServoLeft");
+        intakeServos = new IntakeServos(intakeServoRight, intakeServoLeft);
+
+        // Initialize extendo servos
+        extendoServoRight = hardwareMap.get(Servo.class, "ExtendoServoRight");
+        extendoServoLeft = hardwareMap.get(Servo.class, "ExtendoServoLeft");
+        extendoServos = new ExtendoServos(extendoServoRight, extendoServoLeft);
+
+        // Set extendo servos to retracted position
+        extendoServos.retract();
+
+        // Set intake servos to transfer position
+        intakeServos.transferPosition();
     }
+
     @Override
     public void start() {
+        // Ensure the follower starts TeleOp drive
         follower.startTeleopDrive();
     }
+
     @Override
     public void loop() {
-        /* Update Pedro to move the robot based on:
-        - Forward/Backward Movement: -gamepad1.left_stick_y
-        - Left/Right Movement: -gamepad1.left_stick_x
-        - Turn Left/Right Movement: -gamepad1.right_stick_x
-        - Robot-Centric Mode: false
-        */
-
+        // TeleOp movement
         follower.setTeleOpMovementVectors(-gamepad1.left_stick_y, -gamepad1.left_stick_x, -gamepad1.right_stick_x, false);
         follower.update();
 
-
-
-        // Update the game piece color detection
+        // Game Piece Detection and Rumble Feedback
         gamePieceDetection.detectColor();
         String detectedColor = gamePieceDetection.getDetectedColor();
-
-        // Trigger rumble when a correct color (blue or yellow) is detected and intaked
         if ((detectedColor.equals("Blue") || detectedColor.equals("Yellow")) && !hasRumbled) {
             gamepad1.rumble(1000);  // Rumble for 1 second
-            hasRumbled = true;     // Set flag to prevent repeated rumble
+            hasRumbled = true;
         }
-        // Reset flag if the color changes to an invalid or "None"
         if (!detectedColor.equals("Blue") && !detectedColor.equals("Yellow")) {
-            hasRumbled = false; // Reset the flag
+            hasRumbled = false;
         }
 
-
-
-        // Check if the detected color is the opponent's color (assuming the opponent's color is Red)
+        // Opponent Color Detection (e.g., Red)
         if (detectedColor.equals("Red")) {
-            // Opponent's color detected, outake immediately at 0.3 power
-            intakemotor.setPower(0.5);
+            intakemotor.setPower(0.5);  // Outtake at low power
+        } else if (gamepad1.left_bumper) {
+            intakemotor.setPower(-1.0);  // Intake
+        } else if (gamepad1.right_bumper) {
+            intakemotor.setPower(0.5);  // Outtake
         } else {
-            // Check if left or right bumper is pressed for intake/outtake control
-            if (gamepad1.left_bumper) {
-                // Full intake power when left bumper is pressed
-                intakemotor.setPower(-1.0);
-            } else if (gamepad1.right_bumper) {
-                // Outtake at 0.3 power when right bumper is pressed
-                intakemotor.setPower(
-                        0.5);
-            } else {
-                // Stop motor if no bumpers are pressed
-                intakemotor.setPower(0);
-            }
-
-            loopTimer.reset();
+            intakemotor.setPower(0);  // Stop intake motor
         }
+
+        // Servo Control with 700ms Timer for Retraction
+        if (gamepad1.dpad_right) {
+            if (extendoServos.isExtended()) {
+                intakeServos.intakePosition();
+            } else {
+                telemetry.addData("Warning", "Cannot move intake servos to intaking position while extendo servos are retracted!");
+            }
+        } else if (gamepad1.dpad_down) {
+            if (!isRetracting) {
+                intakeServos.transferPosition();  // Move intake servos to transfer position
+                retractTimer.reset();
+                isRetracting = true;  // Start the retraction process
+            }
+        } else if (gamepad1.dpad_up) {
+            if (!isRetracting) {
+                extendoServos.extend();
+            }
+        }
+
+        // Manage the 700ms delay
+        if (isRetracting && retractTimer.milliseconds() > 700) {
+            extendoServos.retract();  // Ensure servos are fully retracted after 700ms
+            isRetracting = false;    // Reset the state
+        }
+
+
 
         // Viper Slide Control (PID)
         controller.setPID(p, i, d);
@@ -194,10 +227,6 @@ public class BlueTeleop extends OpMode {
         // Update the state variable
         limitSwitchPreviouslyPressed = isLimitSwitchPressed;
 
-        // Measure and report loop time
-        double loopTimeMs = loopTimer.milliseconds();
-        telemetry.addData("Loop Time (ms)", loopTimeMs);
-
         // Telemetry for debugging and visualization
         telemetry.addData("posLeft", slidePosLeft);
         telemetry.addData("posRight", slidePosRight);
@@ -207,9 +236,6 @@ public class BlueTeleop extends OpMode {
         telemetry.addData("X", follower.getPose().getX());
         telemetry.addData("Y", follower.getPose().getY());
         telemetry.addData("Heading in Degrees", Math.toDegrees(follower.getPose().getHeading()));
-
         telemetry.update();
     }
-
-
 }

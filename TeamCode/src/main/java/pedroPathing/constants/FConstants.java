@@ -9,7 +9,7 @@ import com.qualcomm.robotcore.hardware.DcMotorSimple;
 public class FConstants {
     static {
         FollowerConstants.localizers = Localizers.OTOS;
-
+        //FollowerConstants.useBrakeModeInTeleOp;
         FollowerConstants.leftFrontMotorName = "leftFront";
         FollowerConstants.leftRearMotorName = "leftRear";
         FollowerConstants.rightFrontMotorName = "rightFront";
