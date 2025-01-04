@@ -1,4 +1,4 @@
-package OpMode.TeleOp.Subsystems;
+package OpMode.Subsystems;
 
 import com.qualcomm.robotcore.hardware.ColorSensor;
 

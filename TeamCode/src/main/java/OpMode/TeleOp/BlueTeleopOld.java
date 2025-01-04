@@ -2,45 +2,52 @@ package OpMode.TeleOp;
 
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.config.Config;
+import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
+import com.arcrobotics.ftclib.controller.PIDController;
 import com.pedropathing.util.Constants;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.hardware.TouchSensor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
-import OpMode.Subsystems.BucketServos;
 import OpMode.Subsystems.GamePieceDetection;
 import OpMode.Subsystems.ClawServo;
 import OpMode.Subsystems.ExtendoServos;
-import OpMode.Subsystems.ViperSlides;
-import OpMode.Subsystems.IntakeServos;
-import pedroPathing.constants.FConstants;
-import pedroPathing.constants.LConstants;
 
 import com.pedropathing.follower.Follower;
 import com.pedropathing.localization.Pose;
 
+import OpMode.Subsystems.IntakeServos;
+import pedroPathing.constants.FConstants;
+import pedroPathing.constants.LConstants;
+
 @Config
-@TeleOp(name = "BlueTeleop", group = "Active")
-public class BlueTeleop extends OpMode {
+@TeleOp(name = "BlueTeleopOld", group = "Inactive")
+public class BlueTeleopOld extends OpMode {
 
     // Viper Slide Variables
+    private PIDController controller;
     public static double p = 0.01, i = 0, d = 0.0;
     public static double f = 0.1;
-    private ViperSlides viperSlides;
-    // PedroPathing Teleop
+    public static int target = 0;
+    private final double ticks_in_degree = 537.7 / 360;
+    private DcMotorEx slidemotorright;
+    private DcMotorEx slidemotorleft;
+
     private Follower follower;
     private final Pose startPose = new Pose(0, 0, 0);
     private FtcDashboard dashboard;
 
     // REV Touch Sensor (Limit Switch)
     private TouchSensor limitSwitch;
+    private boolean limitSwitchPreviouslyPressed = false;
 
-    // Servos
+    // Intake and Extendo Servos
     private Servo intakeServoRight;
     private Servo intakeServoLeft;
     private IntakeServos intakeServos; // Intake subsystem instance
@@ -48,10 +55,6 @@ public class BlueTeleop extends OpMode {
     private Servo extendoServoLeft;
     private ExtendoServos extendoServos;
     private ClawServo clawServo;
-    private Servo bucketServoRight;
-    private Servo bucketServoLeft;
-    private BucketServos bucketServos;
-
 
     // Intake Motor and Color Sensor
     private DcMotor intakemotor;
@@ -64,11 +67,10 @@ public class BlueTeleop extends OpMode {
     // Declare the timer for the extendo servo retraction
     private ElapsedTime retractTimer = new ElapsedTime();
     private boolean isRetracting = false;
+    // Declare the timer for retract button action
+    private ElapsedTime retractButtonTimer = new ElapsedTime();
+    private boolean isRetractingButtonPressed = false;
 
-    // Variables for Left Trigger Rising Edge Detection
-    private boolean previousLeftTriggerState = false;
-    private boolean currentLeftTriggerState = false;
-    private boolean isClawOpen = false;
 
     @Override
     public void init() {
@@ -79,17 +81,23 @@ public class BlueTeleop extends OpMode {
         loopTimer = new ElapsedTime();
 
         // Initialize Viper Slide
-        viperSlides = new ViperSlides(
-                hardwareMap.get(DcMotorEx.class, "slidemotorleft"),
-                hardwareMap.get(DcMotorEx.class, "slidemotorright"),
-                hardwareMap.get(TouchSensor.class, "limitSwitch"),
-                p, i, d
-        );
+        controller = new PIDController(p, i, d);
+        telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
 
         // Initialize Pedro follower
-        Constants.setConstants(FConstants.class, LConstants.class);
+        Constants.setConstants(FConstants.class,LConstants.class);
         follower = new Follower(hardwareMap);
         follower.setStartingPose(startPose);
+
+        // Initialize slide motors
+        slidemotorleft = hardwareMap.get(DcMotorEx.class, "slidemotorleft");
+        slidemotorleft.setDirection(DcMotorSimple.Direction.REVERSE);
+        slidemotorleft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        slidemotorleft.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+
+        slidemotorright = hardwareMap.get(DcMotorEx.class, "slidemotorright");
+        slidemotorright.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        slidemotorright.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
         // Initialize Dashboard
         dashboard = FtcDashboard.getInstance();
@@ -111,21 +119,11 @@ public class BlueTeleop extends OpMode {
         extendoServoLeft = hardwareMap.get(Servo.class, "ExtendoServoLeft");
         extendoServos = new ExtendoServos(extendoServoRight, extendoServoLeft);
 
-        // Initialize claw servo
-        clawServo = new ClawServo(hardwareMap.get(Servo.class, "ClawServo"));
-
         // Set extendo servos to retracted position
         extendoServos.retract();
 
         // Set intake servos to transfer position
         intakeServos.transferPosition();
-
-        // Initialize Bucket Servo
-        bucketServoRight = hardwareMap.get(Servo.class, "BucketServoRight");
-        bucketServoLeft = hardwareMap.get(Servo.class, "BucketServoLeft");
-        bucketServos = new BucketServos(bucketServoRight, bucketServoLeft);
-
-
     }
 
     @Override
@@ -162,33 +160,6 @@ public class BlueTeleop extends OpMode {
             intakemotor.setPower(0);  // Stop intake motor
         }
 
-        // Rising edge detection for left trigger to toggle claw
-        currentLeftTriggerState = gamepad1.left_trigger > 0.3;  // Detect if the left trigger is pressed
-        if (currentLeftTriggerState && !previousLeftTriggerState) {  // Rising edge
-            // Toggle claw position on rising edge
-            if (isClawOpen) {
-                clawServo.ClosedPosition();  // Close the claw
-            } else {
-                clawServo.OpenPosition();  // Open the claw
-            }
-            // Flip the claw state
-            isClawOpen = !isClawOpen;
-        }
-        previousLeftTriggerState = currentLeftTriggerState;  // Update the previous state
-
-        // Bucket Servo Control Based on Slide Position and Right Trigger
-        if (viperSlides.getSlidePositionRight() > 1950) {
-            if (gamepad1.right_trigger > 0.1) {
-                bucketServos.depositPosition(); // Move bucket to deposit position if right trigger is pressed and slides are up
-            } else {
-                bucketServos.transferPosition();   // Otherwise, set bucket transfer position
-            }
-        } else {
-            bucketServos.transferPosition();       // If the slide position is not less than 1950, set bucket to 1
-        }
-
-
-
         // Servo Control with 700ms Timer for Retraction
         if (gamepad1.dpad_right) {
             if (extendoServos.isExtended()) {
@@ -214,26 +185,58 @@ public class BlueTeleop extends OpMode {
             isRetracting = false;    // Reset the state
         }
 
-        // Viper Slide Control (Predefined Targets)
-        viperSlides.update();
+        // Viper Slide Control (PID)
+        controller.setPID(p, i, d);
+        int slidePosLeft = slidemotorleft.getCurrentPosition();
+        int slidePosRight = slidemotorright.getCurrentPosition();
+        double pidLeft = controller.calculate(slidePosLeft, target);
+        double pidRight = controller.calculate(slidePosRight, target);
+        double ff = Math.cos(Math.toRadians(target / ticks_in_degree)) * f;
+        double powerLeft = pidLeft + ff;
+        double powerRight = pidRight + ff;
 
+        slidemotorleft.setPower(powerLeft);
+        slidemotorright.setPower(powerRight);
+
+        // Button presses to change target for the Viper slide
         if (gamepad1.y) {
-            viperSlides.setTarget(ViperSlides.Target.HIGH);
+            target = 2950;
         }
         if (gamepad1.a) {
-            viperSlides.setTarget(ViperSlides.Target.GROUND);
+            target = 0;
         }
         if (gamepad1.x) {
-            viperSlides.setTarget(ViperSlides.Target.LOW);
+            target = 900;
         }
         if (gamepad1.b) {
-            viperSlides.setTarget(ViperSlides.Target.MEDIUM);
+            target = 1400;
         }
 
+        // **Limit Switch Functionality (Debounce)**
+        boolean isLimitSwitchPressed = limitSwitch.isPressed();
+        if (isLimitSwitchPressed && !limitSwitchPreviouslyPressed) {
+            // Reset encoders to zero
+            slidemotorleft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+            slidemotorright.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+
+            // Set target position to 0
+            slidemotorleft.setTargetPosition(0);
+            slidemotorright.setTargetPosition(0);
+
+            // Re-enable running without encoders after reset
+            slidemotorleft.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+            slidemotorright.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+
+            telemetry.addData("Limit Switch", "Resetting encoders");
+        }
+
+        // Update the state variable
+        limitSwitchPreviouslyPressed = isLimitSwitchPressed;
+
         // Telemetry for debugging and visualization
-        telemetry.addData("Slide Position Left", viperSlides.getSlidePositionLeft());
-        telemetry.addData("Slide Position Right", viperSlides.getSlidePositionRight());
-        telemetry.addData("Slide Target", viperSlides.getTarget());
+        telemetry.addData("posLeft", slidePosLeft);
+        telemetry.addData("posRight", slidePosRight);
+        telemetry.addData("target", target);
         telemetry.addData("Detected Color", detectedColor);
         /* Telemetry Outputs of our Follower */
         telemetry.addData("X", follower.getPose().getX());

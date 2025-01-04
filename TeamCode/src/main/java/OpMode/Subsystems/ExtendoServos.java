@@ -1,4 +1,4 @@
-package OpMode.TeleOp.Subsystems;
+package OpMode.Subsystems;
 
 import com.qualcomm.robotcore.hardware.Servo;
 
@@ -13,8 +13,8 @@ public class ExtendoServos {
         this.extendoServoLeft = leftServo;
 
         // Scale the servos' range during initialization
-        extendoServoRight.scaleRange(0.72, 0.99);  // Scale for ExtendoServoRight (reversed)
-        extendoServoLeft.scaleRange(0.03, 0.3);   // Scale for ExtendoServoLeft (non-reversed)
+        extendoServoRight.scaleRange(0.72, 0.99);  // Scale for ExtendoServoRight (reversed) ( change this for adjustments )
+        extendoServoLeft.scaleRange(0.03, 0.3);   // Scale for ExtendoServoLeft (non-reversed) ( change this for adjustments )
     }
 
     public boolean isExtended() {
@@ -25,7 +25,13 @@ public class ExtendoServos {
         return rightExtended && leftExtended;
     }
 
-
+    public boolean isRetracted() {
+        // Check if servos are in the retracted position
+        double tolerance = 0.1;
+        boolean rightRetracted = Math.abs(extendoServoRight.getPosition() - 1.0) < tolerance;
+        boolean leftRetracted = Math.abs(extendoServoLeft.getPosition() - 0.0) < tolerance;
+        return rightRetracted && leftRetracted;
+    }
 
     // Method to extend both servos
     public void extend() {
