@@ -15,12 +15,12 @@ public class ClawServo {
     }
 
     // Method to move both servos to the Transfer Position
-    public void OpenPosition() {
+    public void openPosition() {
         ClawServo.setPosition(0);  // Set to maximum after scaling
     }
 
     // Method to move both servos to the Intake Position
-    public void ClosedPosition() {
+    public void closedPosition() {
         ClawServo.setPosition(1);  // Set to minimum after scaling
     }
 

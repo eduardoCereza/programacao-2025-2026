@@ -16,6 +16,7 @@ import OpMode.Subsystems.BucketServos;
 import OpMode.Subsystems.GamePieceDetection;
 import OpMode.Subsystems.ClawServo;
 import OpMode.Subsystems.ExtendoServos;
+import OpMode.Subsystems.IntakeMotor;
 import OpMode.Subsystems.ViperSlides;
 import OpMode.Subsystems.IntakeServos;
 import pedroPathing.constants.FConstants;
@@ -55,6 +56,7 @@ public class BlueTeleop extends OpMode {
 
     // Intake Motor and Color Sensor
     private DcMotor intakemotor;
+    private IntakeMotor intakeMotor;
     private ColorSensor colorSensor;
     private GamePieceDetection gamePieceDetection;
     private boolean hasRumbled = false;
@@ -63,7 +65,6 @@ public class BlueTeleop extends OpMode {
     private ElapsedTime loopTimer;
     // Declare the timer for the extendo servo retraction
     private ElapsedTime retractTimer = new ElapsedTime();
-    private boolean isRetracting = false;
 
     // Variables for Left Trigger Rising Edge Detection
     private boolean previousLeftTriggerState = false;
@@ -98,7 +99,7 @@ public class BlueTeleop extends OpMode {
         limitSwitch = hardwareMap.get(TouchSensor.class, "limitSwitch");
 
         // Initialize motors and sensors
-        intakemotor = hardwareMap.get(DcMotor.class, "intakemotor");
+        intakeMotor = new IntakeMotor(hardwareMap.get(DcMotor.class, "intakemotor"));
         colorSensor = hardwareMap.get(ColorSensor.class, "colorSensor");
 
         // Initialize intake servos
@@ -153,13 +154,13 @@ public class BlueTeleop extends OpMode {
 
         // Opponent Color Detection (e.g., Red)
         if (detectedColor.equals("Red")) {
-            intakemotor.setPower(0.5);  // Outtake at low power
+            intakeMotor.outtake();  // Outtake at low power
         } else if (gamepad1.left_bumper) {
-            intakemotor.setPower(-1.0);  // Intake
+            intakeMotor.intake();  // Intake
         } else if (gamepad1.right_bumper) {
-            intakemotor.setPower(0.5);  // Outtake
+            intakeMotor.outtake();  // Outtake
         } else {
-            intakemotor.setPower(0);  // Stop intake motor
+            intakeMotor.stop();  // Stop intake motor
         }
 
         // Rising edge detection for left trigger to toggle claw
@@ -167,9 +168,9 @@ public class BlueTeleop extends OpMode {
         if (currentLeftTriggerState && !previousLeftTriggerState) {  // Rising edge
             // Toggle claw position on rising edge
             if (isClawOpen) {
-                clawServo.ClosedPosition();  // Close the claw
+                clawServo.closedPosition();  // Close the claw
             } else {
-                clawServo.OpenPosition();  // Open the claw
+                clawServo.openPosition();  // Open the claw
             }
             // Flip the claw state
             isClawOpen = !isClawOpen;
@@ -189,7 +190,7 @@ public class BlueTeleop extends OpMode {
 
 
 
-        // Servo Control with 700ms Timer for Retraction
+        // Servo Control Logic
         if (gamepad1.dpad_right) {
             if (extendoServos.isExtended()) {
                 intakeServos.intakePosition();
@@ -197,22 +198,25 @@ public class BlueTeleop extends OpMode {
                 telemetry.addData("Warning", "Cannot move intake servos to intaking position while extendo servos are retracted!");
             }
         } else if (gamepad1.dpad_down) {
-            if (!isRetracting) {
-                intakeServos.transferPosition();  // Move intake servos to transfer position
-                retractTimer.reset();
-                isRetracting = true;  // Start the retraction process
+            if (intakeServos.isIntakePosition()) {
+                // If intake servos are in intake position, move them to transfer position
+                intakeServos.transferPosition();
+            } else if (intakeServos.isTransferPosition()) {
+                // If intake servos are already in transfer position, retract extendo servos
+                extendoServos.retract();
+            } else {
+                telemetry.addData("Warning", "Intake servos must be in either intake or transfer position to proceed!");
             }
         } else if (gamepad1.dpad_up) {
-            if (!isRetracting) {
+            if (!extendoServos.isExtended()) {
                 extendoServos.extend();
             }
+        } else if (gamepad1.dpad_left) {
+            // Move intake servos to transfer position
+            intakeServos.transferPosition();
         }
 
-        // Manage the 700ms delay
-        if (isRetracting && retractTimer.milliseconds() > 700) {
-            extendoServos.retract();  // Ensure servos are fully retracted after 700ms
-            isRetracting = false;    // Reset the state
-        }
+
 
         // Viper Slide Control (Predefined Targets)
         viperSlides.update();
