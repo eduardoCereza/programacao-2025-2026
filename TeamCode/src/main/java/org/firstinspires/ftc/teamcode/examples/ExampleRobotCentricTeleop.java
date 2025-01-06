@@ -1,15 +1,13 @@
-package pedroPathing.examples;
-
-import android.provider.SyncStateContract;
+package org.firstinspires.ftc.teamcode.examples;
 
 import com.pedropathing.follower.Follower;
 import com.pedropathing.localization.Pose;
 import com.pedropathing.util.Constants;
-import  com.qualcomm.robotcore.eventloop.opmode.OpMode;
+import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
-import pedroPathing.constants.FConstants;
-import pedroPathing.constants.LConstants;
+import org.firstinspires.ftc.teamcode.constants.FConstants;
+import org.firstinspires.ftc.teamcode.constants.LConstants;
 
 /**
  * This is an example teleop that showcases movement and robot-centric driving.
@@ -26,7 +24,7 @@ public class ExampleRobotCentricTeleop extends OpMode {
     /** This method is call once when init is played, it initializes the follower **/
     @Override
     public void init() {
-        Constants.setConstants(FConstants.class,LConstants.class);
+        Constants.setConstants(FConstants.class, LConstants.class);
         follower = new Follower(hardwareMap);
         follower.setStartingPose(startPose);
     }
