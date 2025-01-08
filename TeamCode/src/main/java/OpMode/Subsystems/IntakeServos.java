@@ -31,15 +31,15 @@ public class IntakeServos {
 
     // Method to check if the servos are in the Intake Position
     public boolean isIntakePosition() {
-        double tolerance = 0.1;
-        boolean rightIntake = Math.abs(IntakeServoRight.getPosition() - 0.1) < tolerance;
+        double tolerance = 0.2;
+        //boolean rightIntake = Math.abs(IntakeServoRight.getPosition() - 0.1) < tolerance;
         boolean leftIntake = Math.abs(IntakeServoLeft.getPosition() - 0.9) < tolerance;
         return /*rightIntake &&*/ leftIntake;
     }
 
     // Method to check if the servos are in the Transfer Position
     public boolean isTransferPosition() {
-        double tolerance = 0.1;
+        double tolerance = 0.2;
         //boolean rightTransfer = Math.abs(IntakeServoRight.getPosition() - 1.0) < tolerance;
         boolean leftTransfer = Math.abs(IntakeServoLeft.getPosition() - 0.0) < tolerance;
         return /*rightTransfer &&*/ leftTransfer;

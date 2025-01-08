@@ -63,8 +63,10 @@ public class BlueTeleop extends OpMode {
 
     // Loop Timer
     private ElapsedTime loopTimer;
+
     // Declare the timer for the extendo servo retraction
     private ElapsedTime retractTimer = new ElapsedTime();
+    private boolean isRetracting = false;
 
     // Variables for Left Trigger Rising Edge Detection
     private boolean previousLeftTriggerState = false;
@@ -137,6 +139,10 @@ public class BlueTeleop extends OpMode {
 
     @Override
     public void loop() {
+        // Measure the time elapsed since the last loop iteration
+        double loopTime = loopTimer.seconds() * 1000;  // Convert seconds to milliseconds
+        loopTimer.reset();  // Reset the timer for the next loop iteration
+
         // TeleOp movement
         follower.setTeleOpMovementVectors(-gamepad1.left_stick_y, -gamepad1.left_stick_x, -gamepad1.right_stick_x, false);
         follower.update();
@@ -178,8 +184,8 @@ public class BlueTeleop extends OpMode {
         previousLeftTriggerState = currentLeftTriggerState;  // Update the previous state
 
         // Bucket Servo Control Based on Slide Position and Right Trigger
-        if (viperSlides.getSlidePositionRight() > 1950) {
-            if (gamepad1.right_trigger > 0.1) {
+        if (viperSlides.getSlidePositionLeft() > 1950) {
+            if (gamepad1.right_trigger > 0.3) {
                 bucketServos.depositPosition(); // Move bucket to deposit position if right trigger is pressed and slides are up
             } else {
                 bucketServos.transferPosition();   // Otherwise, set bucket transfer position
@@ -190,33 +196,35 @@ public class BlueTeleop extends OpMode {
 
 
 
-        // Servo Control Logic
+        // Servo Control with 700ms Timer for Retraction
         if (gamepad1.dpad_right) {
             if (extendoServos.isExtended()) {
                 intakeServos.intakePosition();
             } else {
                 telemetry.addData("Warning", "Cannot move intake servos to intaking position while extendo servos are retracted!");
             }
+
+        } else if (gamepad1.dpad_left) {
+            // Move intake servos to transfer position without retracting extendo servos
+            intakeServos.transferPosition();
+
         } else if (gamepad1.dpad_down) {
-            if (intakeServos.isIntakePosition()) {
-                // If intake servos are in intake position, move them to transfer position
-                intakeServos.transferPosition();
-            } else if (intakeServos.isTransferPosition()) {
-                // If intake servos are already in transfer position, retract extendo servos
-                extendoServos.retract();
-            } else {
-                telemetry.addData("Warning", "Intake servos must be in either intake or transfer position to proceed!");
+            if (!isRetracting) {
+                intakeServos.transferPosition();  // Move intake servos to transfer position
+                retractTimer.reset();
+                isRetracting = true;  // Start the retraction process
             }
         } else if (gamepad1.dpad_up) {
-            if (!extendoServos.isExtended()) {
+            if (!isRetracting) {
                 extendoServos.extend();
             }
-        } else if (gamepad1.dpad_left) {
-            // Move intake servos to transfer position
-            intakeServos.transferPosition();
         }
 
-
+        // Manage the 700ms delay
+        if (isRetracting && retractTimer.milliseconds() > 700) {
+            extendoServos.retract();  // Ensure servos are fully retracted after 700ms
+            isRetracting = false;    // Reset the state
+        }
 
         // Viper Slide Control (Predefined Targets)
         viperSlides.update();
@@ -234,7 +242,37 @@ public class BlueTeleop extends OpMode {
             viperSlides.setTarget(ViperSlides.Target.MEDIUM);
         }
 
+        // Check if Controller 1's A button is pressed to reset the Viper slides
+        if (gamepad1.options) {
+            // Disable PID control temporarily
+            viperSlides.setPIDEnabled(false);  // Disable PID control
+
+            // Move slides down until the limit switch is triggered
+            while (!viperSlides.isLimitSwitchPressed()) {
+                // Set the motor to move the slides down (negative direction)
+                viperSlides.setSlidePower(-1.0); // Adjust the power as needed
+            }
+
+            // Once the limit switch is pressed, stop the motor
+            viperSlides.setSlidePower(0); // Stop the motor
+
+            // Optionally, reset the position of the Viper slides to 0
+            viperSlides.resetPosition(); // Reset the encoder and set position to 0
+
+            // Re-enable PID control after the manual reset
+            viperSlides.setPIDEnabled(true);  // Re-enable PID control
+        }
+
+        if (gamepad1.back) {
+            // Reset the heading to zero
+            Pose currentPose = follower.getPose();
+            Pose newPose = new Pose(currentPose.getX(), currentPose.getY(), 0); // Set heading to 0
+            follower.setStartingPose(newPose);
+        }
+
+
         // Telemetry for debugging and visualization
+        telemetry.addData("Loop Time (ms)", loopTime);  // Show the loop time in ms
         telemetry.addData("Slide Position Left", viperSlides.getSlidePositionLeft());
         telemetry.addData("Slide Position Right", viperSlides.getSlidePositionRight());
         telemetry.addData("Slide Target", viperSlides.getTarget());

@@ -500,32 +500,32 @@ public class Autonomous04 extends OpMode {
         buildPaths();
 
         // Initialize ViperSlides
-        DcMotorEx slideMotorLeft = hardwareMap.get(DcMotorEx.class, "slideMotorLeft");
-        DcMotorEx slideMotorRight = hardwareMap.get(DcMotorEx.class, "slideMotorRight");
+        DcMotorEx slideMotorLeft = hardwareMap.get(DcMotorEx.class, "slidemotorleft");
+        DcMotorEx slideMotorRight = hardwareMap.get(DcMotorEx.class, "slidemotorright");
         TouchSensor limitSwitch = hardwareMap.get(TouchSensor.class, "limitSwitch");
         viperSlides = new ViperSlides(slideMotorLeft, slideMotorRight, limitSwitch, 0.01, 0.0, 0.005);
 
         // Initialize Bucket Servos
         bucketServos = new BucketServos(
-                hardwareMap.get(Servo.class, "bucketServoRight"),
-                hardwareMap.get(Servo.class, "bucketServoLeft")
+                hardwareMap.get(Servo.class, "BucketServoRight"),
+                hardwareMap.get(Servo.class, "BucketServoLeft")
         );
 
         // Initialize Claw Servo
         clawServo = new ClawServo(
-                hardwareMap.get(Servo.class, "clawServo")
+                hardwareMap.get(Servo.class, "ClawServo")
         );
 
         // Initialize Extendo Servos
         extendoServos = new ExtendoServos(
-                hardwareMap.get(Servo.class, "extendoServoRight"),
-                hardwareMap.get(Servo.class, "extendoServoLeft")
+                hardwareMap.get(Servo.class, "ExtendoServoRight"),
+                hardwareMap.get(Servo.class, "ExtendoServoLeft")
         );
 
         // Initialize Intake Servos
         intakeServos = new IntakeServos(
-                hardwareMap.get(Servo.class, "intakeServoRight"),
-                hardwareMap.get(Servo.class, "intakeServoLeft")
+                hardwareMap.get(Servo.class, "IntakeServoRight"),
+                hardwareMap.get(Servo.class, "IntakeServoLeft")
         );
 
     }
