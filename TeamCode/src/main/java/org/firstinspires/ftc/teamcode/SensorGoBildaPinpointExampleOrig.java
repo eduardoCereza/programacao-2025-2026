@@ -57,10 +57,10 @@ For support, contact tech@gobilda.com
 -Ethan Doak
  */
 
-@TeleOp(name="goBILDA® PinPoint Odometry Example", group="Linear OpMode")
+@TeleOp(name="original goBILDA® PinPoint Odometry Example", group="Linear OpMode")
 //@Disabled
 
-public class SensorGoBildaPinpointExample extends LinearOpMode {
+public class SensorGoBildaPinpointExampleOrig extends LinearOpMode {
 
     GoBildaPinpointDriver odo; // Declare OpMode member for the Odometry Computer
 

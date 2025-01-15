@@ -8,25 +8,26 @@ import com.qualcomm.robotcore.hardware.DcMotorSimple;
 
 public class FConstants {
     static {
-        FollowerConstants.localizers = Localizers.THREE_WHEEL;
+        FollowerConstants.localizers = Localizers.PINPOINT;
 
-        FollowerConstants.leftFrontMotorName = "leftFront";
-        FollowerConstants.leftRearMotorName = "leftRear";
-        FollowerConstants.rightFrontMotorName = "rightFront";
-        FollowerConstants.rightRearMotorName = "rightRear";
+        FollowerConstants.leftFrontMotorName = "LFdrive";
+        FollowerConstants.leftRearMotorName = "LBdrive";
+        FollowerConstants.rightFrontMotorName = "RFdrive";
+        FollowerConstants.rightRearMotorName = "RBdrive";
 
-        FollowerConstants.leftFrontMotorDirection = DcMotorSimple.Direction.REVERSE;
-        FollowerConstants.leftRearMotorDirection = DcMotorSimple.Direction.REVERSE;
-        FollowerConstants.rightFrontMotorDirection = DcMotorSimple.Direction.FORWARD;
-        FollowerConstants.rightRearMotorDirection = DcMotorSimple.Direction.FORWARD;
+        FollowerConstants.leftFrontMotorDirection = DcMotorSimple.Direction.FORWARD;
+        FollowerConstants.leftRearMotorDirection = DcMotorSimple.Direction.FORWARD;
+        FollowerConstants.rightFrontMotorDirection = DcMotorSimple.Direction.REVERSE;
+        FollowerConstants.rightRearMotorDirection = DcMotorSimple.Direction.REVERSE;
 
-        FollowerConstants.mass = 13;
+        FollowerConstants.mass = 11.7934;
 
-        FollowerConstants.xMovement = 57.8741;
-        FollowerConstants.yMovement = 52.295;
+        FollowerConstants.xMovement = 62.1496;
+        FollowerConstants.yMovement = 47.8777;
 
-        FollowerConstants.forwardZeroPowerAcceleration = -41.278;
-        FollowerConstants.lateralZeroPowerAcceleration = -59.7819;
+        FollowerConstants.forwardZeroPowerAcceleration = -35.4169;
+        FollowerConstants.lateralZeroPowerAcceleration = -68.5132;
+
 
         FollowerConstants.translationalPIDFCoefficients.setCoefficients(0.1,0,0.01,0);
         FollowerConstants.useSecondaryTranslationalPID = false;
