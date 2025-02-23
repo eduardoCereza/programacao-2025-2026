@@ -49,7 +49,7 @@ import pedroPathing.constants.LConstants;
 @Config
 @Autonomous(name = "Forward Velocity Tuner", group = "Automatic Tuners")
 public class ForwardVelocityTuner extends OpMode {
-    private ArrayList<Double> velocities = new ArrayList<>();
+    private final ArrayList<Double> velocities = new ArrayList<>();
 
     private DcMotorEx leftFront;
     private DcMotorEx leftRear;
@@ -59,8 +59,8 @@ public class ForwardVelocityTuner extends OpMode {
 
     private PoseUpdater poseUpdater;
 
-    public static double DISTANCE = 48;
-    public static double RECORD_NUMBER = 10;
+    public static final double DISTANCE      = 48;
+    public static final double RECORD_NUMBER = 10;
 
     private Telemetry telemetryA;
 
@@ -163,7 +163,7 @@ public class ForwardVelocityTuner extends OpMode {
             for (Double velocity : velocities) {
                 average += velocity;
             }
-            average /= (double) velocities.size();
+            average /= velocities.size();
 
             telemetryA.addData("forward velocity:", average);
             telemetryA.update();

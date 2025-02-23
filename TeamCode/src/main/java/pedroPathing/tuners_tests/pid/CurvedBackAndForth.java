@@ -34,7 +34,7 @@ import pedroPathing.constants.LConstants;
 public class CurvedBackAndForth extends OpMode {
     private Telemetry telemetryA;
 
-    public static double DISTANCE = 20;
+    public static final double DISTANCE = 20;
 
     private boolean forward = true;
 
