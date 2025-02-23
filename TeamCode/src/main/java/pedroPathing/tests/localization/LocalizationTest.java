@@ -1,4 +1,4 @@
-package pedroPathing.tuners_tests.localization;
+package pedroPathing.tests.localization;
 
 import static com.pedropathing.follower.FollowerConstants.leftFrontMotorName;
 import static com.pedropathing.follower.FollowerConstants.leftRearMotorName;

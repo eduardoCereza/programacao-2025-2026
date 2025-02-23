@@ -1,4 +1,4 @@
-package pedroPathing.tuners_tests.pid;
+package pedroPathing.tests.pid;
 
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.config.Config;
