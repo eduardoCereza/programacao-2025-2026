@@ -6,6 +6,8 @@ import com.pedropathing.util.CustomFilteredPIDFCoefficients;
 import com.pedropathing.util.CustomPIDFCoefficients;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 
+
+//I like Apples and Banaas
 public class FConstants {
     static {
         FollowerConstants.localizers = Localizers.THREE_WHEEL;
@@ -20,7 +22,7 @@ public class FConstants {
         FollowerConstants.rightFrontMotorDirection = DcMotorSimple.Direction.FORWARD;
         FollowerConstants.rightRearMotorDirection = DcMotorSimple.Direction.FORWARD;
 
-        FollowerConstants.mass = 4.627;
+        FollowerConstants.mass = 4.627; //super light
 
         FollowerConstants.xMovement = 57.8741;
         FollowerConstants.yMovement = 52.295;
