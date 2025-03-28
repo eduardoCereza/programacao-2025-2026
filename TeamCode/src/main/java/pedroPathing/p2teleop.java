@@ -1,11 +1,10 @@
-// FTC TeleOp Program - Optimized for Driver Control
+package pedroPathing;// FTC TeleOp Program - Optimized for Driver Control
 
 // Import necessary FTC libraries
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Servo;
-import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 
 @TeleOp(name = "Two Player Teleop")
 public class p2teleop extends LinearOpMode {
