@@ -58,9 +58,43 @@ public class p2teleop extends LinearOpMode {
                 armServo.setPosition(1);
             }
 
+            // Declare a variable to track the claw state
+            boolean clawClosed = false;
+            boolean xWasPressed = false; // Tracks if X was previously pressed
+
+            // Inside your loop:
             if (gamepad2.x) {
-                arm_clawServo.setPosition();
+                claw.setPosition(1); // Close if true, open if false
+            } else {
+                claw.setPosition(0);
             }
+
+            // Add these as class members (global variables) so their values persist between loops
+            double rdServoPos = 0; // Start at neutral (adjust if needed)
+            double ldServoPos = 1; // Start at neutral (adjust if needed)
+
+            // Then inside your loop, replace your current servo control section with:
+            double servoStep = 0.01;  // Adjust step size as needed
+
+            // Check for left bumper press (move servos up)
+            if (gamepad2.left_bumper) {
+                rdServoPos += servoStep;
+                ldServoPos += -servoStep;
+            }
+
+            // Check for right bumper press (move servos down)
+            if (gamepad2.right_bumper) {
+                rdServoPos -= servoStep;
+                ldServoPos -= -servoStep;
+            }
+
+            // Clamp positions to valid range (0 to 1)
+            rdServoPos = Math.max(0, Math.min(1, rdServoPos));
+            ldServoPos = Math.max(0, Math.min(1, ldServoPos));
+
+            // Apply the new positions
+            rdServo.setPosition(rdServoPos);
+            ldServo.setPosition(ldServoPos);
 
             // Slide control (hold to move, release to stop)
             if (gamepad2.dpad_up) {
