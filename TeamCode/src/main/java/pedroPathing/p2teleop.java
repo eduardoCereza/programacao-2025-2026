@@ -70,22 +70,15 @@ public class p2teleop extends LinearOpMode {
 
             // Move servos up when left bumper is held
             if (gamepad2.left_bumper) {
-
+                rdServo.setPosition(0);
+                ldServo.setPosition(1);
             }
 
             // Move servos down when right bumper is held
             if (gamepad2.right_bumper) {
-                rdServoPosition -= servoStep;
-                ldServoPosition -= servoStep;
+                rdServo.setPosition(1);
+                ldServo.setPosition(0);
             }
-
-            // Clamp positions to valid range (0 to 1)
-            rdServoPosition = Math.max(0, Math.min(1, rdServoPosition));
-            ldServoPosition = Math.max(0, Math.min(1, ldServoPosition));
-
-            // Apply the new positions
-            rdServo.setPosition(rdServoPosition);
-            ldServo.setPosition(ldServoPosition);
 
             // Slide control (hold to move, release to stop)
             if (gamepad2.dpad_up) {
