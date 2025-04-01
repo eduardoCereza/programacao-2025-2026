@@ -11,19 +11,10 @@ public class p2teleop extends LinearOpMode {
     // Declare hardware variables
     DcMotor slide_horizontalMotor, winch_rightMotor, winch_leftMotor, slide_verticalMotor;
     DcMotor topRight, topLeft, bottomRight, bottomLeft;  // Declare drivetrain motors
-    Servo arm_clawServo, armServo, rdServo, ldServo;
+    Servo arm_clawServo, armServo, claw, rdServo, ldServo;
 
-    // Define State Machine Enum
-    private enum RobotState {
-        IDLE,
-        INTAKE_SPECIMEN,  // Intake specimen logic
-        INTAKE_SAMPLE_EXTEND,  // Extend horizontal slide
-        INTAKE_SAMPLE_GRAB,    // Close claw
-        INTAKE_SAMPLE_RETRACT, // Retract slide
-        INTAKE_SAMPLE_ROTATE   // Rotate servos
-    }
-
-    private RobotState currentState = RobotState.IDLE; // Initial state
+    // Slide speed variable
+    private static final double SLIDE_SPEED = 0.5; // Adjust this to control the speed
 
     @Override
     public void runOpMode() {
@@ -41,69 +32,64 @@ public class p2teleop extends LinearOpMode {
 
         arm_clawServo = hardwareMap.servo.get("arm_clawServo");
         armServo = hardwareMap.servo.get("armServo");
+        claw = hardwareMap.servo.get("claw");
         rdServo = hardwareMap.servo.get("rdServo");
         ldServo = hardwareMap.servo.get("ldServo");
 
-        // Reverse motors to ensure correct direction
+        // Reverse motors if needed
         topLeft.setDirection(DcMotor.Direction.REVERSE);
         bottomLeft.setDirection(DcMotor.Direction.REVERSE);
-
-        // Set zero power behavior for more controllable drivetrain
-        topLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        topRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        bottomLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        bottomRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        slide_verticalMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
         waitForStart();
 
         while (opModeIsActive()) {
-            // State Machine Logic
-            switch (currentState) {
-                case IDLE:
-                    if (gamepad2.x) {
-                        currentState = RobotState.INTAKE_SPECIMEN;
-                    } else if (gamepad2.y) {
-                        currentState = RobotState.INTAKE_SAMPLE_EXTEND;
-                    }
-                    break;
-
-                case INTAKE_SPECIMEN:
-                    // TODO: Add specimen intake logic
-                    currentState = RobotState.IDLE;
-                    break;
-
-                case INTAKE_SAMPLE_EXTEND:
-                    // TODO: Extend slide
-                    currentState = RobotState.INTAKE_SAMPLE_GRAB;
-                    break;
-
-                case INTAKE_SAMPLE_GRAB:
-                    // TODO: Close claw
-                    currentState = RobotState.INTAKE_SAMPLE_RETRACT;
-                    break;
-
-                case INTAKE_SAMPLE_RETRACT:
-                    // TODO: Retract slide
-                    currentState = RobotState.INTAKE_SAMPLE_ROTATE;
-                    break;
-
-                case INTAKE_SAMPLE_ROTATE:
-                    // TODO: Rotate diff servos
-                    currentState = RobotState.IDLE;
-                    break;
+            // Claw controls
+            if (gamepad2.a) {
+                arm_clawServo.setPosition(0); // Open claw
+            } else {
+                arm_clawServo.setPosition(1); // Close claw
             }
 
-            // Add drivetrain control to the IDLE state (you can modify this for another state if needed)
+            // Arm servo control
+            if (gamepad2.b) {
+                armServo.setPosition(0);
+            } else {
+                armServo.setPosition(1);
+            }
+
+            if (gamepad2.x) {
+                arm_clawServo.setPosition();
+            }
+
+            // Slide control (hold to move, release to stop)
+            if (gamepad2.dpad_up) {
+                slide_verticalMotor.setPower(SLIDE_SPEED); // Move up
+            } else if (gamepad2.dpad_down) {
+                slide_verticalMotor.setPower(-SLIDE_SPEED); // Move down
+            } else {
+                slide_verticalMotor.setPower(0); // Stop when released
+            }
+
+            // Slide control (hold to move, release to stop)
+            if (gamepad2.dpad_left) {
+                slide_horizontalMotor.setPower(SLIDE_SPEED); // Move up
+            } else if (gamepad2.dpad_right) {
+                slide_horizontalMotor.setPower(-SLIDE_SPEED); // Move down
+            } else {
+                slide_horizontalMotor.setPower(0); // Stop when released
+            }
+
+            // Drivetrain control
             driveTrainControl();
 
-            telemetry.addData("State", currentState);
             telemetry.update();
         }
     }
 
     // Method to control the drivetrain using mecanum logic
     private void driveTrainControl() {
-        double drive = -gamepad1.left_stick_y; // Forward/backward
+        double drive = gamepad1.left_stick_y; // Forward/backward
         double strafe = gamepad1.left_stick_x; // Left/right
         double rotate = gamepad1.right_stick_x; // Rotation
 
