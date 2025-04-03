@@ -2,8 +2,14 @@
 
 This contains all of the code for the Into The Deep FTC competition ( 24 / 25 )
 
-### please read
+## Please read
 
-DO NOT click on dialog box saying upgrade AGP, or something similar, please ignore it
+DO NOT click on the dialogue box saying "Upgrade AGP" or something similar—ignore it—it will break everything. Also, if Gradle says it has an error, do not click any blue links. Look in the [FTC Cookbook](https://cookbook.dairy.foundation/introduction.html) for more info about these issues.
 
-to contribute, make branch and pr to main
+To contribute, make branch and pr to main.
+
+## Useful Resources 
+
+[FTC Cookbook](https://cookbook.dairy.foundation/introduction.html) - very useful for programming
+[gm0](https://gm0.org/en/latest/) - useful all around
+[Pedro Pathing](https://pedropathing.com/) - GOATED localisation
