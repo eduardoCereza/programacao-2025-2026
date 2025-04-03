@@ -10,6 +10,6 @@ To contribute, make branch and pr to main.
 
 ## Useful Resources 
 
-[FTC Cookbook](https://cookbook.dairy.foundation/introduction.html) - very useful for programming <\br>
-[gm0](https://gm0.org/en/latest/) - useful all around
-[Pedro Pathing](https://pedropathing.com/) - GOATED localisation
+[FTC Cookbook](https://cookbook.dairy.foundation/introduction.html) - very useful for programming <br>
+[gm0](https://gm0.org/en/latest/) - useful all around <br>
+[Pedro Pathing](https://pedropathing.com/) - GOATED localisation <br>
