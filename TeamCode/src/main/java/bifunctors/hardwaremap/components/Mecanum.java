@@ -30,15 +30,20 @@ public class Mecanum {
         this.PowerMultiplier = powerMultiplier;
     }
 
+    public void SendMecanumTelemetry(Telemetry telemetry){
+        telemetry.addLine().addData("FR power", frontRightMotor.getPower());
+        telemetry.addLine().addData("BR power", backRightMotor.getPower());
+        telemetry.addLine().addData("BL power", backLeftMotor.getPower());
+        telemetry.addLine().addData("FL power", frontLeftMotor.getPower());
+    }
+
     /**
      * Analyses gamepad and sets power of motors appropriately
      * @param gp Gamepad object
      */
     public void Move(Gamepad gp) {
-        // If invalid power multiplier range is provided then just set value to 1
-        if(!(PowerMultiplier > 0 && PowerMultiplier <= 1)) {
-            PowerMultiplier = 1;
-        }
+        // If invalid power multiplier is provided then clamp to either 0 or 1
+        PowerMultiplier = Math.max(0, Math.min(1, PowerMultiplier));
 
         // Y values need to be inverted
         double y = -gp.left_stick_y;
