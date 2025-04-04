@@ -51,9 +51,21 @@ public class p2teleop extends LinearOpMode {
 
         while (opModeIsActive()){
 
+
+            if (gamepad1.right_bumper) {
+                winch_leftMotor.setPower(1);
+                winch_rightMotor.setPower(-1);
+            } else if (gamepad1.left_bumper) {
+                winch_rightMotor.setPower(1);
+                winch_leftMotor.setPower(-1);
+            } else {
+                winch_leftMotor.setPower(0);
+                winch_rightMotor.setPower(0);
+            }
+
             // Arm servo control
             if (gamepad2.b) {
-                armServo.setPosition(.3);
+                armServo.setPosition(.1);
             }
 
             if (gamepad2.right_trigger == 1) {
@@ -67,6 +79,11 @@ public class p2teleop extends LinearOpMode {
             if (gamepad2.a) {
                 armServo.setPosition(1);
             }
+
+            //if (gamepad2.y) {
+                //telemetry.addData("y button detected");
+            // this was commented out  because it was used for a test if the servo programming was wrong or the cable was damaged.
+            // it ended up being the cable.
 
             // --- Toggle for arm_clawServo using gamepad2.y ---
             // Rising edge detection for y button
