@@ -6,7 +6,7 @@ import com.qualcomm.robotcore.hardware.DcMotorSimple;
 
 import bifunctors.hardwaremap.components.Mecanum;
 
-public class TestingHardwareMap {
+public class BifunctorsHardwareMap {
     /*
         -----------------------------------------------------------------------
         | FRW               | Front Right Wheel     | Control Hub Motor X     |
@@ -24,7 +24,7 @@ public class TestingHardwareMap {
     public DcMotorEx BackRightWheel;
     public Mecanum MecanumSet;
 
-    public TestingHardwareMap(com.qualcomm.robotcore.hardware.HardwareMap hardwareMap){
+    public BifunctorsHardwareMap(com.qualcomm.robotcore.hardware.HardwareMap hardwareMap){
         FrontRightWheel = hardwareMap.get(DcMotorEx.class, "FRW");
         FrontRightWheel.setDirection(DcMotorSimple.Direction.FORWARD);
 
