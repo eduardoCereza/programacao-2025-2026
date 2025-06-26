@@ -4,22 +4,23 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 
+import Subsystems.DriveSubsystem;
+import Subsystems.RobotSubsystem;
+
 @Autonomous
-public class MotorTest extends LinearOpMode{
+public class MotorTest extends RobotSubsystem {
 
     DcMotor bob;
 
     @Override
     public void runOpMode() throws InterruptedException {
-
-        bob = hardwareMap.get(DcMotor.class, "bob");
+        initialize(hardwareMap);
 
 
         waitForStart();
 
             while (opModeIsActive()){
-
-                bob.setPower(1);
+                drive.setMotorPower(1);
             }
 
     }

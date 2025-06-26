@@ -11,7 +11,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.UnnormalizedAngleUnit
 
 import java.util.Locale;
 
-import Drivers.GoBildaPinpointDriver;
+import lib.Drivers.GoBildaPinpointDriver;
 
 
 @TeleOp(name="goBILDA Pinpoint Example", group="Linear OpMode")

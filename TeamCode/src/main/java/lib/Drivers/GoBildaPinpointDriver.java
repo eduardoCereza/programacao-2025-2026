@@ -20,7 +20,7 @@
  *   SOFTWARE.
  */
 
-package Drivers;
+package lib.Drivers;
 
 import static com.qualcomm.robotcore.util.TypeConversion.byteArrayToInt;
 

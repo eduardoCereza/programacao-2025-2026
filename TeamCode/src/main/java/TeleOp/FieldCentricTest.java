@@ -1,14 +1,14 @@
 package TeleOp;
 
-import Subsystems.Robot;
+import Subsystems.DriveSubsystem;
+import Subsystems.RobotSubsystem;
 
-import com.arcrobotics.ftclib.command.CommandScheduler;
 import com.arcrobotics.ftclib.gamepad.GamepadEx;
+import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 
-
-
-public class FieldCentricTest extends Robot {
+@TeleOp
+public class FieldCentricTest extends RobotSubsystem {
 
     protected GamepadEx driverPad;
     protected GamepadEx operatorPad;
@@ -32,13 +32,13 @@ public class FieldCentricTest extends Robot {
 
 
 
-
         }
 
 
 //      public void configureOperator() {
 //
 //      }
+
 
 
     }
