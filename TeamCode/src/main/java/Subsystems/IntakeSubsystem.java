@@ -1,4 +1,6 @@
 package Subsystems;
 
-public class IntakeSubsystem {
+import com.arcrobotics.ftclib.command.SubsystemBase;
+
+public class IntakeSubsystem extends SubsystemBase {
 }

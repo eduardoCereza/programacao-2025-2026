@@ -9,7 +9,7 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 
 public abstract class RobotSubsystem extends LinearOpMode {
 
-//    public SlideSubsystem slides;
+    public SlideSubsystem slides;
 //    public WristSubsystem wrist;
 //    public IntakeSubsystem intake;
     public DriveSubsystem drive;
@@ -32,7 +32,7 @@ public abstract class RobotSubsystem extends LinearOpMode {
         drive = new DriveSubsystem(hardwareMap);
 //        intake = new IntakeSubsystem(hardwareMap, telemetry);
 //        wrist = new WristSubsystem(hardwareMap, telemetry);
-//        slides = new SlideSubsystem(hardwareMap, telemetry);
+        slides = new SlideSubsystem(hardwareMap);
         lmec = new LMECSubsystem(hardwareMap);
 
         CommandScheduler.getInstance().registerSubsystem(drive, lmec);

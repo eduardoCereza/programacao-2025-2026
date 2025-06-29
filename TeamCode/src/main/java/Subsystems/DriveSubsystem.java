@@ -39,13 +39,13 @@ public class DriveSubsystem extends SubsystemBase {
         leftBack.setDirection(DcMotorSimple.Direction.REVERSE);
     }
 
-    public double getHeading() {
+    public double getHeadingRads() {
         return odo.getHeading(AngleUnit.RADIANS);
     }
 
     public void driveFieldCentric(double gamepadX, double gamepadY, double gamepadRX, double heading) {
 
-        double headingRads = getHeading();
+        double headingRads = getHeadingRads();
         double rotX = gamepadX * Math.cos(-headingRads) - gamepadY * Math.sin(-headingRads);
         double rotY = gamepadX * Math.sin(-headingRads) + gamepadY * Math.cos(-headingRads);
 
@@ -67,9 +67,7 @@ public class DriveSubsystem extends SubsystemBase {
         }
     }
 
-
     public void setMotorPower (double power){
-
         leftFront.setPower(power);
         leftBack.setPower(power);
         rightFront.setPower(power);
