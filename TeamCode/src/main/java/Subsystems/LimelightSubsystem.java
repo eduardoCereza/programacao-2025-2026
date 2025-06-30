@@ -22,8 +22,8 @@ public class LimelightSubsystem extends SubsystemBase {
        return limelight.getLatestResult().getFiducialResults();
     }
 
-    public void getDetections(){
-
+    public List<LLResultTypes.DetectorResult>  getDetections(){
+        return limelight.getLatestResult().getDetectorResults();
     }
 
     public void getDetections(double numDetections){
