@@ -35,7 +35,7 @@ public abstract class RobotSubsystem extends LinearOpMode {
 //        slides = new SlideSubsystem(hardwareMap);
 //        lmec = new LMECSubsystem(hardwareMap);
 
-        CommandScheduler.getInstance().registerSubsystem(drive, lmec);
+        CommandScheduler.getInstance().registerSubsystem(drive);
     }
 
 
