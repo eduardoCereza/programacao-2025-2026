@@ -29,6 +29,7 @@ public class DriveSubsystem extends SubsystemBase {
         leftBack = hardwareMap.get(DcMotorEx.class, "backLeft");
         rightBack = hardwareMap.get(DcMotorEx.class, "backRight");
         rightFront = hardwareMap.get(DcMotorEx.class, "frontRight");
+        odo = hardwareMap.get(GoBildaPinpointDriver.class, "odo");
 
         leftFront.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         leftBack.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
@@ -43,12 +44,13 @@ public class DriveSubsystem extends SubsystemBase {
         return odo.getHeading(AngleUnit.RADIANS);
     }
 
+    public double getHeadingDeg() {
+        return odo.getHeading(AngleUnit.DEGREES);
+    }
+
     public void driveFieldCentric(double gamepadX, double gamepadY, double gamepadRX, double heading) {
-
-        double headingRads = getHeadingRads();
-        double rotX = gamepadX * Math.cos(-headingRads) - gamepadY * Math.sin(-headingRads);
-        double rotY = gamepadX * Math.sin(-headingRads) + gamepadY * Math.cos(-headingRads);
-
+        double rotX = gamepadX * Math.cos(-heading) - gamepadY * Math.sin(-heading);
+        double rotY = gamepadX * Math.sin(-heading) + gamepadY * Math.cos(-heading);
 
         double denominator = Math.max(Math.abs(rotY) + Math.abs(rotX) + Math.abs(gamepadRX), 1);
         double frontLeftPower = (rotY + rotX + gamepadRX) / denominator;
