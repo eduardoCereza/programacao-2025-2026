@@ -20,7 +20,7 @@ public class DefaultDriveCommand extends CommandBase {
         this.y = inputY;
         this.rx = inputRx;
         this.heading = robotHeading;
-        addRequirements(this.driveSubsystem);
+        addRequirements(driveSubsystem);
 
     }
 
