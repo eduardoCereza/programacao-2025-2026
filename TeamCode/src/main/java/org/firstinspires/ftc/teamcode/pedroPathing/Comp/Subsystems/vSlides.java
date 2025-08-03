@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.pedroPathing.Comp;
+package org.firstinspires.ftc.teamcode.pedroPathing.Comp.Subsystems;
 
 
 import static org.firstinspires.ftc.robotcore.external.BlocksOpModeCompanion.hardwareMap;
@@ -6,13 +6,12 @@ import static org.firstinspires.ftc.robotcore.external.BlocksOpModeCompanion.har
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
-public class OuttakeSubsystem {
+import org.firstinspires.ftc.teamcode.pedroPathing.Comp.Config;
+
+public class vSlides {
 
     enum slideState{
-        FLOOR, SKY
-    }
-    enum armState{
-
+        FLOOR, SKY, CUSTOM
     }
     //declerations
     private Config config;
@@ -26,7 +25,7 @@ public class OuttakeSubsystem {
     private double lastError;
     private ElapsedTime timer = new ElapsedTime();
     //constructor
-    public OuttakeSubsystem() {
+    public vSlides() {
             config = new Config();
             slides = hardwareMap.get(DcMotor.class, config.StarboardSlideName);
             slides2 = hardwareMap.get(DcMotor.class, config.PortSlideName);

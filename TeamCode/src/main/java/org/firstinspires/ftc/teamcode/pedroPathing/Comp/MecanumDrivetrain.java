@@ -31,8 +31,8 @@ public class MecanumDrivetrain {
         frontRight = hardwareMap.get(DcMotor.class, config.frontRight);
         frontRight.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         frontRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        if(Max_Speed > 1){
-            Max_Speed = 1;
+        if(Max_Speed > 1.0){
+            Max_Speed = 1.0;
         }
         max_Speed = Max_Speed;
     }
@@ -56,5 +56,9 @@ public class MecanumDrivetrain {
         backLeft.setPower(leftBackPower*max_Speed);
         backRight.setPower(rightBackPower*max_Speed);
         frontRight.setPower(rightFrontPower*max_Speed);
+    }
+    public void modifyMaxSpeed(double newMultiplier){
+        max_Speed = newMultiplier;
+
     }
 }

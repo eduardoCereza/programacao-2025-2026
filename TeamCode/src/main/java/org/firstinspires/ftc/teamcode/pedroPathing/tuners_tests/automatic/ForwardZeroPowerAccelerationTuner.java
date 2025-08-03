@@ -49,7 +49,7 @@ import org.firstinspires.ftc.teamcode.pedroPathing.constants.LConstants;
  */
 @Config
 @Autonomous(name = "Forward Zero Power Acceleration Tuner", group = "Automatic Tuners")
-public class ForwardZeroPowerAccelerationTuner extends OpMode {
+public class    ForwardZeroPowerAccelerationTuner extends OpMode {
     private ArrayList<Double> accelerations = new ArrayList<>();
 
     private DcMotorEx leftFront;
@@ -60,7 +60,7 @@ public class ForwardZeroPowerAccelerationTuner extends OpMode {
 
     private PoseUpdater poseUpdater;
 
-    public static double VELOCITY = 30;
+    public static double VELOCITY = 10;
 
     private double previousVelocity;
 
