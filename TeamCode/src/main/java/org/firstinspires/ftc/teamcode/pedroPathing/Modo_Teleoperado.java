@@ -7,6 +7,7 @@ import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
+import com.qualcomm.robotcore.hardware.Servo;
 
 import org.firstinspires.ftc.teamcode.pedroPathing.constants.FConstants;
 import org.firstinspires.ftc.teamcode.pedroPathing.constants.LConstants;
@@ -16,7 +17,10 @@ public class Modo_Teleoperado extends OpMode {
     private Follower follower;
     private final Pose startPose = new Pose(0, 0, Math.toRadians(180));
     DcMotor slide;
-    int estadoMove;
+    int estadoMove, estadoServo;
+
+    Servo servo, garra;
+
     @Override
     public void init(){
 
@@ -80,5 +84,38 @@ public class Modo_Teleoperado extends OpMode {
         telemetry.addData("Posição slide: ", position);
     }
 
+    public void servoMove(){
+        if (gamepad2.cross){
+            //pegar sample
+            estadoServo = 1;
+        }else if(gamepad2.circle){
+            //pegar clip/ deixar na cesta
+            estadoServo = 2;
+        }else if(gamepad1.triangle){
+            //clipar
+            estadoServo = 3;
+        }
+
+        if (estadoServo == 1){
+            //pegar sample
+            servo.setPosition(1);
+
+        } else if (estadoServo == 2) {
+            //pegar clip/ deixar na cesta
+
+            servo.setPosition(0.5);
+        } else if (estadoServo == 3) {
+            //clipar
+            estadoServo = 3;
+        }
+    }
+
+    public void servoClip(){
+        if (gamepad2.right_bumper){
+            garra.setPosition(1);
+        }else{
+            garra.setPosition(0);
+        }
+    }
 
 }
