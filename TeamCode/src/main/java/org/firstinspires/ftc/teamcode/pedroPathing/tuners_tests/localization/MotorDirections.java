@@ -19,12 +19,11 @@ import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.configuration.typecontainers.MotorConfigurationType;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
+import org.firstinspires.ftc.teamcode.pedroPathing.constants.FConstants;
+import org.firstinspires.ftc.teamcode.pedroPathing.constants.LConstants;
 
 import java.util.Arrays;
 import java.util.List;
-
-import org.firstinspires.ftc.teamcode.pedroPathing.constants.FConstants;
-import org.firstinspires.ftc.teamcode.pedroPathing.constants.LConstants;
 
 @TeleOp(name = "Motor Directions", group = "Teleop Test")
 public class MotorDirections extends OpMode {
@@ -102,6 +101,10 @@ public class MotorDirections extends OpMode {
         telemetryA.addData("Left Rear Motor Direction: ", leftRearMotorDirection);
         telemetryA.addData("Right Front Motor Direction: ", rightFrontMotorDirection);
         telemetryA.addData("Right Rear Motor Direction: ", rightRearMotorDirection);
+        telemetryA.addData("leftF:", leftFront.getCurrentPosition());
+        telemetryA.addData("leftB:", leftRear.getCurrentPosition());
+        telemetryA.addData("rightF:", rightFront.getCurrentPosition());
+        telemetryA.addData("rightB:", rightRear.getCurrentPosition());
         telemetryA.update();
     }
 }
