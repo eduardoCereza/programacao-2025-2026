@@ -21,6 +21,8 @@ public class Modo_Teleoperado extends OpMode {
 
     Servo ponta, garra;
 
+    boolean holdSlide = false, holdArm = false;
+
     @Override
     public void init(){
 
@@ -90,13 +92,21 @@ public class Modo_Teleoperado extends OpMode {
         int position = slide.getCurrentPosition();
         double control = gamepad2.left_stick_y;
         if (control > 0){
+            slide.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+
             slide.setPower(power);
+            holdSlide = false;
         } else if (control < 0) {
+            slide.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+
             slide.setPower(-power);
-        }else {
+            holdSlide = false;
+        }else if (!holdSlide){
+            slide.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
             slide.setTargetPosition(position);
             slide.setMode(DcMotor.RunMode.RUN_TO_POSITION);
             slide.setPower(1);
+            holdSlide = true;
         }
 
         telemetry.addData("Posição slide: ", position);
@@ -109,7 +119,7 @@ public class Modo_Teleoperado extends OpMode {
         }else if(gamepad2.circle){
             //pegar clip/ deixar na cesta
             estadoServo = 2;
-        }else if(gamepad1.triangle){
+        }else if(gamepad2.triangle){
             //clipar
             estadoServo = 3;
         }
@@ -126,7 +136,6 @@ public class Modo_Teleoperado extends OpMode {
             //clipar
             garra.setPosition(0);
 
-            estadoServo = 3;
         }
     }
 
@@ -140,12 +149,20 @@ public class Modo_Teleoperado extends OpMode {
 
     public void moveActuator(){
 
-        if (left.getCurrentPosition() == 0){
-            if (gamepad2.right_stick_y > 0){
-                left.setPower(0.6);
-                right.setPower(0.6);
-            }
-            else{
+        if (gamepad2.right_stick_y > 0) {
+            left.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+            right.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+                left.setPower(0.3);
+                right.setPower(0.3);
+                holdArm = false;
+        } else if (gamepad2.right_stick_y < 0) {
+            left.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+            right.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+                left.setPower(-0.3);
+                right.setPower(-0.3);
+                holdArm = false;
+        }
+        else if (!holdArm){
                 left.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
                 right.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
@@ -157,28 +174,8 @@ public class Modo_Teleoperado extends OpMode {
 
                 left.setPower(1);
                 right.setPower(1);
+                holdArm = true;
             }
-        }
-        else {
-            if (gamepad2.right_stick_y > 0) {
-                left.setPower(0.6);
-                right.setPower(0.6);
-            } else if (gamepad1.right_stick_y < 0) {
-                left.setPower(-0.6);
-                right.setPower(-0.6);
-            } else {
-                left.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-                right.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
-                left.setTargetPosition(left.getCurrentPosition());
-                right.setTargetPosition(right.getCurrentPosition());
-
-                left.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-                right.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-
-                left.setPower(1);
-                right.setPower(1);
-            }
-        }
     }
 }

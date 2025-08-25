@@ -19,8 +19,8 @@ import com.qualcomm.robotcore.hardware.Servo;
 import org.firstinspires.ftc.teamcode.pedroPathing.constants.FConstants;
 import org.firstinspires.ftc.teamcode.pedroPathing.constants.LConstants;
 
-@Autonomous(name = "Path Test")
-public class pathTest extends OpMode {
+@Autonomous(name = "3 Clips")
+public class SãoPaulo_3Clips extends OpMode {
 
     public void clipPos(){
         garra.setPosition(0.95);
@@ -149,17 +149,12 @@ public class pathTest extends OpMode {
     private final Pose ClipPose = new Pose(-48.5, -12, Math.toRadians(-180)); //clipa
     private final Pose Control1   = new Pose(-67  , -63.0 , Math.toRadians(-180.00));
     private final Pose move2      = new Pose(-14.0  , -63.0 , Math.toRadians(-180.00)); //perto do sample
-    private final Pose move3      = new Pose(-14.0  , -90.0 , Math.toRadians(-180.00)); //frente do primero sample
-    private final Pose move4      = new Pose(-60  , -90.0 , Math.toRadians(-180.00)); //empurra o primeiro sample
-    private final Pose move5      = new Pose(-17.0  , -110 , Math.toRadians(-180.00)); //volta do primeiro sample
-    private final Pose move6      = new Pose(-71.5  , -110 , Math.toRadians(-180.00)); //empurra do segundo sample, pega specimen
-
-    private final Pose control2   = new Pose(-60  , -5.0 , Math.toRadians(-180.00));
+    private final Pose move3      = new Pose(-14.0  , -100.0 , Math.toRadians(-180.00)); //frente do primero sample
+    private final Pose move4      = new Pose(-76  , -100.0 , Math.toRadians(-180.00)); //empurra o primeiro sample
     private final Pose clip2      = new Pose(-47  ,  -5.0 , Math.toRadians(-180.00));
-    private final Pose moveX      = new Pose(-20  ,  -5 , Math.toRadians(-180.00));
-
-    private final Pose move7      = new Pose(-58.0  , -53.0 , Math.toRadians(-180.00));
-    private final Pose move8      = new Pose(-70.0  , -58.0 , Math.toRadians(-180.00));
+    private final Pose moveX      = new Pose(-40  ,  -5 , Math.toRadians(-180.00));
+    private final Pose move7      = new Pose(-58.0  , -100 , Math.toRadians(-180.00));
+    private final Pose move8      = new Pose(-76.0  , -100 , Math.toRadians(-180.00));
     private final Pose clip3      = new Pose(-48.9  ,   7.0 , Math.toRadians(-180.00));
     private PathChain traj1, traj2, traj3, traj4, traj5, traj6, traj7, trajdrift; //conjunto de trajetórias
 
@@ -182,19 +177,9 @@ public class pathTest extends OpMode {
                 //drift
                 .build();
 
-        //trajdrift = follower.pathBuilder()
-                //.addPath(new BezierLine(new Point(move4), new Point(move3)))
-                //.setConstantHeadingInterpolation(Math.toRadians(-180.00))
-                //.build();
-        //traj3 = follower.pathBuilder()
-                //.addPath(new BezierLine(new Point(move3), new Point(move5)))
-                //.setConstantHeadingInterpolation(Math.toRadians(-180.00))
-                //.addPath(new BezierLine(new Point(move5), new Point(move6)))
-                //.setConstantHeadingInterpolation(Math.toRadians(-180.00))
-                //.build();
 
         traj4 = follower.pathBuilder()
-                .addPath(new BezierLine(new Point(move6), new Point(clip2)))
+                .addPath(new BezierLine(new Point(move4), new Point(clip2)))
                 .setConstantHeadingInterpolation(Math.toRadians(-180.00))
                 .addPath(new BezierLine(new Point(clip2), new Point(moveX)))
                 .setConstantHeadingInterpolation(Math.toRadians(-180.00))
@@ -218,12 +203,12 @@ public class pathTest extends OpMode {
     public void autonomousPathUpdate() {
         switch (pathState) {
             case 0:
-            follower.followPath(traj1, 1.0, true);
-            closed();
-            subir(900);
-            extender(-1300);
-            setPathState(1);
-            break;
+                follower.followPath(traj1, 1.0, true);
+                closed();
+                subir(900);
+                extender(-1300);
+                setPathState(1);
+                break;
 
             case 1:
                 if (!follower.isBusy() && pathState == 1){
@@ -238,30 +223,28 @@ public class pathTest extends OpMode {
                     specimenPickpos();
                     //0.75
                     follower.followPath(traj2, 0.9, true);
-                    setPathState(100);
+                    setPathState(2);
                 }
                 break;
             //arrasta os dois
-            case 100:
-                if(!follower.isBusy() && pathState == 100){
-                    follower.followPath(trajdrift, 1.0, true);
-                    setPathState(105);
-                }
-                break;
             case 2:
                 if (!follower.isBusy() && pathState ==2){
                     //0.6
-                    follower.followPath(traj3, 1.0, true);
-                    setPathState(3);//
+                    closed();
+                    num = 2;
+                    setPathState(101);//
                 }
                 break;
             //pega o specimen
             case 3:
                 if(!follower.isBusy() && pathState == 3){
-                    closed();
-                    num = 2;
-                    pathTimer.resetTimer();
-                    setPathState(101);
+                    if(num == 2 && ponta.getPosition() == 0.0)
+                        subir(900);
+                        follower.followPath(traj4, 0.8, true);
+                        clipPos();
+                        slide.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
+                        extender(-1250);
+                        setPathState(5);
                 }
                 break;
             case 4:
@@ -287,13 +270,14 @@ public class pathTest extends OpMode {
             case 6:
                 if(!follower.isBusy() && num == 4 && pathState == 6){
                     recuar(-100);
-                    descer(-10);
+                    descer(10);
                     specimenPickpos();
                     setPathState(7);
                 }
                 break;
             case 7:
-                follower.followPath(traj5, 1.0, false);
+                follower.followPath(traj5, 1.0, true);
+                specimenPickpos();
                 setPathState(8);
                 break;
             case 8:
@@ -303,14 +287,26 @@ public class pathTest extends OpMode {
                     setPathState(104);}
                 break;
             case 9:
-                subir(-650);
+                subir(900);
+                follower.followPath(traj6, 1.0, true);
+                slide.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+                extender(-1200);
+                pathState = 10;
                 break;
-
+            case 10:
+                if(!follower.isBusy() && pathState == 10){
+                    extender(-1300);
+                    open();
+                    setPathState(11);
+                }
+                break;
+            case 11:
+                break;
             //estaciona
 
             case 101:
                 if(pathTimer.getElapsedTimeSeconds() > 0.5){
-                    setPathState(4);
+                    setPathState(3);
                 }
             case 102:
                 if(pathTimer.getElapsedTimeSeconds() > 0.5){
