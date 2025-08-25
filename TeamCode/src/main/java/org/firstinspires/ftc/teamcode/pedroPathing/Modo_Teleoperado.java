@@ -37,6 +37,7 @@ public class Modo_Teleoperado extends OpMode {
 
     public void start(){
         follower.startTeleopDrive();
+        estadoMove = 1;
     }
 
     @Override
