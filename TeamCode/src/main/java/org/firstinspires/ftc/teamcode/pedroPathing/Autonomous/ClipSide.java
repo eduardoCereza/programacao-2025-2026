@@ -235,7 +235,7 @@ public class ClipSide extends OpMode {
 
             case 1:
                 if (!follower.isBusy() && pathState == 1){
-                    extender(-1900);
+                    extender(-2000);
                     open();
                     num = 1;
                 }

@@ -4,6 +4,7 @@ package org.firstinspires.ftc.teamcode.pedroPathing.Autonomous;
 
 import com.pedropathing.follower.Follower;
 import com.pedropathing.localization.Pose;
+import com.pedropathing.pathgen.BezierCurve;
 import com.pedropathing.pathgen.BezierLine;
 import com.pedropathing.pathgen.PathChain;
 import com.pedropathing.pathgen.Point;
@@ -144,8 +145,21 @@ public class pathTest extends OpMode {
     // y = lados (se for maior vai para a direita)
     // x = frente e tras (se for maior vai para frente)
     private final Pose startPose = new Pose(-74, -12, Math.toRadians(-180)); //posição inicial do robô
-    private final Pose ClipPose = new Pose(-50, -12, Math.toRadians(-180));
-    private PathChain traj1; //conjunto de trajetórias
+    private final Pose ClipPose = new Pose(-48.5, -12, Math.toRadians(-180)); //clipa
+    private final Pose Control1   = new Pose(-67  , -63.0 , Math.toRadians(-180.00));
+    private final Pose move2      = new Pose(-13.0  , -63.0 , Math.toRadians(-180.00)); //perto do sample
+    private final Pose move3      = new Pose(-13.0  , -90.0 , Math.toRadians(-180.00)); //frente do primero sample
+    private final Pose move4      = new Pose(-60  , -90.0 , Math.toRadians(-180.00)); //empurra o primeiro sample
+    private final Pose move5      = new Pose(-17.0  , -110 , Math.toRadians(-180.00)); //volta do primeiro sample
+    private final Pose move6      = new Pose(-65  , -110 , Math.toRadians(-180.00)); //empurra do segundo sample
+    private final Pose control2   = new Pose(-62.9  , -13.0 , Math.toRadians(-180.00));
+    private final Pose clip2      = new Pose(-47.3  ,  -8.0 , Math.toRadians(-180.00));
+    private final Pose moveX      = new Pose(-42.6  ,  -8.0 , Math.toRadians(-180.00));
+    private final Pose move7      = new Pose(-58.0  , -53.0 , Math.toRadians(-180.00));
+    private final Pose move8      = new Pose(-70.0  , -58.0 , Math.toRadians(-180.00));
+    private final Pose clip3      = new Pose(-48.9  ,   7.0 , Math.toRadians(-180.00));
+    private PathChain traj1, traj2, traj3, traj4, traj5, traj6, traj7; //conjunto de trajetórias
+
 
     public void buildPaths() {
 
@@ -155,41 +169,153 @@ public class pathTest extends OpMode {
                 .setConstantHeadingInterpolation(Math.toRadians(-180))
                 .build();
 
+        traj2 = follower.pathBuilder()
+                .addPath(new BezierCurve(new Point(ClipPose), new Point(Control1), new Point(move2)))
+                .setConstantHeadingInterpolation(Math.toRadians(-180.00))
+                .addPath(new BezierLine(new Point(move2), new Point(move3)))
+                .setConstantHeadingInterpolation(Math.toRadians(-180.00))
+                .addPath(new BezierLine(new Point(move3), new Point(move4)))
+                .setConstantHeadingInterpolation(Math.toRadians(-180.00))
+                .addPath(new BezierLine(new Point(move4), new Point(move3)))
+                .setConstantHeadingInterpolation(Math.toRadians(-180.00))
+                .build();
+
+        traj3 = follower.pathBuilder()
+                .addPath(new BezierLine(new Point(move3), new Point(move5)))
+                .setConstantHeadingInterpolation(Math.toRadians(-180.00))
+                .addPath(new BezierLine(new Point(move5), new Point(move6)))
+                .setConstantHeadingInterpolation(Math.toRadians(-180.00))
+                .build();
+
+        traj4 = follower.pathBuilder()
+                .addPath(new BezierCurve(new Point(move6), new Point(control2), new Point(clip2)))
+                .setConstantHeadingInterpolation(Math.toRadians(-180.00))
+                .addPath(new BezierLine(new Point(clip2), new Point(moveX)))
+                .setConstantHeadingInterpolation(Math.toRadians(-180.00))
+                .build();
+
+        traj5 = follower.pathBuilder()
+                .addPath(new BezierLine(new Point(moveX), new Point(move7)))
+                .setConstantHeadingInterpolation(Math.toRadians(180.00))
+                .addPath(new BezierLine(new Point(move7), new Point(move8)))
+                .setConstantHeadingInterpolation(Math.toRadians(180.00))
+                .build();
+
+        traj6 = follower.pathBuilder()
+                .addPath(new BezierLine(new Point(move8), new Point(clip3)))
+                .setConstantHeadingInterpolation(Math.toRadians(180.00))
+                .build();
+
     }
 
     //dependendo de como funcionar a movimentação do atuador, esses cases vão precisar ser dividos e dividir as trajetórias neles, testar antes
     public void autonomousPathUpdate() {
         switch (pathState) {
             case 0:
-                follower.followPath(traj1, 1.0, false);
-                closed();
-                subir(800);
-                extender(-1270);
-                setPathState(1);
-                break;
+            follower.followPath(traj1, 1.0, true);
+            closed();
+            subir(900);
+            extender(-1300);
+            setPathState(1);
+            break;
+
             case 1:
-                if(!follower.isBusy() && pathState == 1){
-                    extender(-1550);
+                if (!follower.isBusy() && pathState == 1){
+                    extender(-2000);
                     open();
                     num = 1;
                 }
-                if(num == 1){
-                    open();
-                    recuar(0);
+                if (num == 1){
+                    //mudar
+                    recuar(-100);
                     descer(0);
-                    setPathState(2);
+                    specimenPickpos();
+                    //0.75
+                    follower.followPath(traj2, 0.7, true);
+                    setPathState(105);
                 }
                 break;
+            //arrasta os dois
             case 2:
-                closed();
+                if (!follower.isBusy() && pathState ==2){
+                    //0.6
+                    follower.followPath(traj3, 1.0, true);
+                    setPathState(3);//
+                }
+                break;
+            //pega o specimen
+            case 3:
+                if(!follower.isBusy() && pathState == 3){
+                    closed();
+                    num = 2;
+                    pathTimer.resetTimer();
+                    setPathState(101);
+                }
+                break;
+            case 4:
+                if(num == 2 && garra.getPosition() == 0.0){
+                    subir(-630);
+                    //0.6
+                    follower.followPath(traj4, 1.0, true);
+                    clipPos();
+                    slide.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
+                    extender(-1050);
+                    setPathState(5);
+                }
+                break;
+            //clipa
+            case 5:
+                if (!follower.isBusy() && pathState == 5){
+                    extender(-1700);
+                    open();
+                    num = 4;
+                    setPathState(6);
+                }
+                break;
+            case 6:
+                if(!follower.isBusy() && num == 4 && pathState == 6){
+                    recuar(-100);
+                    descer(-10);
+                    specimenPickpos();
+                    setPathState(7);
+                }
+                break;
+            case 7:
+                follower.followPath(traj5, 1.0, false);
+                setPathState(8);
+                break;
+            case 8:
+                if(!follower.isBusy() && pathState == 8){
+                    closed();
+                    pathTimer.resetTimer();
+                    setPathState(104);}
+                break;
+            case 9:
+                subir(-650);
                 break;
 
+            //estaciona
 
             case 101:
                 if(pathTimer.getElapsedTimeSeconds() > 0.5){
+                    setPathState(4);
+                }
+            case 102:
+                if(pathTimer.getElapsedTimeSeconds() > 0.5){
+                    setPathState(8);
+                }
+            case 103:
+                if(pathTimer.getElapsedTimeSeconds() > 0.5){
+                    setPathState(6);
+                }
+            case 104:
+                if(pathTimer.getElapsedTimeSeconds() > 0.5){
+                    setPathState(9);
+                }
+            case 105:
+                if(pathTimer.getElapsedTimeSeconds() > 0.5){
                     setPathState(2);
                 }
-
         }
     }
 

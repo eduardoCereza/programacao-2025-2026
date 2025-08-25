@@ -6,7 +6,7 @@ import com.pedropathing.util.Constants;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.HardwareMap;
+import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.Servo;
 
 import org.firstinspires.ftc.teamcode.pedroPathing.constants.FConstants;
@@ -16,10 +16,10 @@ import org.firstinspires.ftc.teamcode.pedroPathing.constants.LConstants;
 public class Modo_Teleoperado extends OpMode {
     private Follower follower;
     private final Pose startPose = new Pose(0, 0, Math.toRadians(180));
-    DcMotor slide;
+    DcMotor slide, left, right;
     int estadoMove, estadoServo;
 
-    Servo servo, garra;
+    Servo ponta, garra;
 
     @Override
     public void init(){
@@ -32,6 +32,19 @@ public class Modo_Teleoperado extends OpMode {
         slide.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         slide.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         slide.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+
+        left = hardwareMap.get(DcMotorEx.class, "Esq");
+        right = hardwareMap.get(DcMotorEx.class, "Dir");
+
+        left.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        right.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+
+        left.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        right.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+
+        garra = hardwareMap.get(Servo.class, "garra");
+        ponta = hardwareMap.get(Servo.class, "ponta");
+
 
     }
 
@@ -64,6 +77,10 @@ public class Modo_Teleoperado extends OpMode {
         }
 
         slide(0.5);
+        servoMove();
+        servoClip();
+        moveActuator();
+
 
         telemetry.update();
 
@@ -99,24 +116,69 @@ public class Modo_Teleoperado extends OpMode {
 
         if (estadoServo == 1){
             //pegar sample
-            servo.setPosition(1);
+            garra.setPosition(1);
 
         } else if (estadoServo == 2) {
             //pegar clip/ deixar na cesta
+            garra.setPosition(0.6);
 
-            servo.setPosition(0.5);
         } else if (estadoServo == 3) {
             //clipar
+            garra.setPosition(0);
+
             estadoServo = 3;
         }
     }
 
     public void servoClip(){
         if (gamepad2.right_bumper){
-            garra.setPosition(1);
+            ponta.setPosition(1);
         }else{
-            garra.setPosition(0);
+            ponta.setPosition(0);
         }
     }
 
+    public void moveActuator(){
+
+        if (left.getCurrentPosition() == 0){
+            if (gamepad2.right_stick_y > 0){
+                left.setPower(0.6);
+                right.setPower(0.6);
+            }
+            else{
+                left.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+                right.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+
+                left.setTargetPosition(left.getCurrentPosition());
+                right.setTargetPosition(right.getCurrentPosition());
+
+                left.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+                right.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+
+                left.setPower(1);
+                right.setPower(1);
+            }
+        }
+        else {
+            if (gamepad2.right_stick_y > 0) {
+                left.setPower(0.6);
+                right.setPower(0.6);
+            } else if (gamepad1.right_stick_y < 0) {
+                left.setPower(-0.6);
+                right.setPower(-0.6);
+            } else {
+                left.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+                right.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+
+                left.setTargetPosition(left.getCurrentPosition());
+                right.setTargetPosition(right.getCurrentPosition());
+
+                left.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+                right.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+
+                left.setPower(1);
+                right.setPower(1);
+            }
+        }
+    }
 }
