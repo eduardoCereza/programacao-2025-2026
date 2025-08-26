@@ -9,15 +9,13 @@ import com.pedropathing.pathgen.BezierLine;
 import com.pedropathing.pathgen.PathChain;
 import com.pedropathing.pathgen.Point;
 import com.pedropathing.util.Constants;
+import com.pedropathing.util.PIDFController;
 import com.pedropathing.util.Timer;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.Servo;
-
-import org.firstinspires.ftc.teamcode.pedroPathing.constants.FConstants;
-import org.firstinspires.ftc.teamcode.pedroPathing.constants.LConstants;
 
 @Autonomous(name = "3 Clips")
 public class SãoPaulo_3Clips extends OpMode {
@@ -80,11 +78,11 @@ public class SãoPaulo_3Clips extends OpMode {
         holdArm = 1;
     }
     public void hold(){
-        PIDFController controller;
+        PID controller;
 
         double minPower = 0.7;
         double maxPower = 1.0;
-        controller = new PIDFController(12, 4, 5, 13);
+        controller = new PID(12, 4, 5, 13);
         controller.setInputRange(-4000, 4000);
         controller.setOutputRange(minPower, maxPower);
 
@@ -145,18 +143,16 @@ public class SãoPaulo_3Clips extends OpMode {
     // y = lados (se for maior vai para a direita)
     // x = frente e tras (se for maior vai para frente)
     private final Pose startPose = new Pose(-74, -12, Math.toRadians(-180)); //posição inicial do robô
-
-    private final Pose ClipPose = new Pose(-48.5, -12, Math.toRadians(-180)); //clipa
-    private final Pose Control1   = new Pose(-67  , -63.0 , Math.toRadians(-180.00));
-    private final Pose move2      = new Pose(-14.0  , -63.0 , Math.toRadians(-180.00)); //perto do sample
-    private final Pose move3      = new Pose(-14.0  , -100.0 , Math.toRadians(-180.00)); //frente do primero sample
-    private final Pose move4      = new Pose(-76  , -100.0 , Math.toRadians(-180.00)); //empurra o primeiro sample
-    private final Pose clip2      = new Pose(-47  ,  -5.0 , Math.toRadians(-180.00));
-    private final Pose moveX      = new Pose(-40  ,  -5 , Math.toRadians(-180.00));
-    private final Pose move7      = new Pose(-58.0  , -100 , Math.toRadians(-180.00));
-    private final Pose move8      = new Pose(-76.0  , -100 , Math.toRadians(-180.00));
-    private final Pose clip3      = new Pose(-48.9  ,   7.0 , Math.toRadians(-180.00));
-    private PathChain traj1, traj2, traj3, traj4, traj5, traj6, traj7, trajdrift; //conjunto de trajetórias
+    private final Pose ClipPose = new Pose(-48, -12, Math.toRadians(-180.0)); //clipa
+    private final Pose Control1   = new Pose(-68  , -70.0 , Math.toRadians(-180.00));
+    private final Pose move2      = new Pose(-20  , -65.0 , Math.toRadians(-180.00)); //perto do sample
+    private final Pose move3      = new Pose(-10.0  , -85.0 , Math.toRadians(-180.00)); //frente do primero sample
+    private final Pose move4      = new Pose(-83  , -100.0 , Math.toRadians(-180.00)); //empurra o primeiro sample
+    private final Pose clip2      = new Pose(-47  ,  -10 , Math.toRadians(-180.00));
+    private final Pose moveX      = new Pose(-24  ,  -10, Math.toRadians(-180.00));
+    private final Pose move7      = new Pose(-90  , -100 , Math.toRadians(-205.00));
+    private final Pose move8      = new Pose(-107, -100, Math.toRadians(205.00));
+    private PathChain traj1, traj2, traj4, traj5, traj6, traj7; //conjunto de trajetórias
 
 
     public void buildPaths() {
@@ -168,9 +164,7 @@ public class SãoPaulo_3Clips extends OpMode {
                 .build();
 
         traj2 = follower.pathBuilder()
-                .addPath(new BezierCurve(new Point(ClipPose), new Point(Control1), new Point(move2)))
-                .setConstantHeadingInterpolation(Math.toRadians(-180.00))
-                .addPath(new BezierLine(new Point(move2), new Point(move3)))
+                .addPath(new BezierCurve(new Point(ClipPose), new Point(Control1), new Point(move2), new Point(move3)))
                 .setConstantHeadingInterpolation(Math.toRadians(-180.00))
                 .addPath(new BezierLine(new Point(move3), new Point(move4)))
                 .setConstantHeadingInterpolation(Math.toRadians(-180.00))
@@ -187,14 +181,15 @@ public class SãoPaulo_3Clips extends OpMode {
 
         traj5 = follower.pathBuilder()
                 .addPath(new BezierLine(new Point(moveX), new Point(move7)))
-                .setConstantHeadingInterpolation(Math.toRadians(180.00))
+                .setConstantHeadingInterpolation(Math.toRadians(-205.00))
                 .addPath(new BezierLine(new Point(move7), new Point(move8)))
-                .setConstantHeadingInterpolation(Math.toRadians(180.00))
+                .setConstantHeadingInterpolation(Math.toRadians(-205.00))
                 .build();
 
+        //off
         traj6 = follower.pathBuilder()
-                .addPath(new BezierLine(new Point(move8), new Point(clip3)))
-                .setConstantHeadingInterpolation(Math.toRadians(180.00))
+                .addPath(new BezierLine(new Point(move7), new Point(ClipPose)))
+                .setConstantHeadingInterpolation(Math.toRadians(-180.00))
                 .build();
 
     }
@@ -206,7 +201,7 @@ public class SãoPaulo_3Clips extends OpMode {
                 follower.followPath(traj1, 1.0, true);
                 closed();
                 subir(900);
-                extender(-1300);
+                extender(-1390);
                 setPathState(1);
                 break;
 
@@ -240,11 +235,11 @@ public class SãoPaulo_3Clips extends OpMode {
                 if(!follower.isBusy() && pathState == 3){
                     if(num == 2 && ponta.getPosition() == 0.0)
                         subir(900);
-                        follower.followPath(traj4, 0.8, true);
-                        clipPos();
-                        slide.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
-                        extender(-1250);
-                        setPathState(5);
+                    follower.followPath(traj4, 0.8, true);
+                    clipPos();
+                    slide.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
+                    extender(-1400);
+                    setPathState(5);
                 }
                 break;
             case 4:
@@ -254,14 +249,14 @@ public class SãoPaulo_3Clips extends OpMode {
                     follower.followPath(traj4, 0.8, true);
                     clipPos();
                     slide.setMode(DcMotorEx.RunMode.STOP_AND_RESET_ENCODER);
-                    extender(-1250);
+                    extender(-1370);
                     setPathState(5);
                 }
                 break;
             //clipa
             case 5:
                 if (!follower.isBusy() && pathState == 5){
-                    extender(-1700);
+                    extender(-1950);
                     open();
                     num = 4;
                     setPathState(6);
@@ -276,7 +271,7 @@ public class SãoPaulo_3Clips extends OpMode {
                 }
                 break;
             case 7:
-                follower.followPath(traj5, 1.0, true);
+                follower.followPath(traj5, 0.8, true);
                 specimenPickpos();
                 setPathState(8);
                 break;
@@ -287,20 +282,20 @@ public class SãoPaulo_3Clips extends OpMode {
                     setPathState(104);}
                 break;
             case 9:
-                subir(900);
-                follower.followPath(traj6, 1.0, true);
-                slide.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-                extender(-1200);
-                pathState = 10;
+                if (!follower.isBusy() && pathState == 9){
+                    slide.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+                    subir(900);
+                    extender(-1200);
+                    clipPos();
+                    setPathState(10);}
                 break;
             case 10:
                 if(!follower.isBusy() && pathState == 10){
-                    extender(-1300);
-                    open();
                     setPathState(11);
                 }
                 break;
             case 11:
+
                 break;
             //estaciona
 

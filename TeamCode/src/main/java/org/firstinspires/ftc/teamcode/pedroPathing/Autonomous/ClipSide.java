@@ -16,9 +16,6 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.Servo;
 
-import org.firstinspires.ftc.teamcode.pedroPathing.constants.FConstants;
-import org.firstinspires.ftc.teamcode.pedroPathing.constants.LConstants;
-
 @Autonomous(name = "Clip")
 public class ClipSide extends OpMode {
 
@@ -94,11 +91,11 @@ public class ClipSide extends OpMode {
     }
 
     public void hold(){
-        PIDFController controller;
+        PID controller;
 
         double minPower = 0.7;
         double maxPower = 1.0;
-        controller = new PIDFController(12, 4, 5, 13);
+        controller = new PID(12, 4, 5, 13);
         controller.setInputRange(-4000, 4000);
         controller.setOutputRange(minPower, maxPower);
 

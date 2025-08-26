@@ -1,12 +1,12 @@
 package org.firstinspires.ftc.teamcode.pedroPathing.Autonomous;
-public class PIDFController {
+public class PID {
     public static double Kp, Ki, Kd, Kf;
     private double setPoint = 0, minInput = 0, maxInput = 0, minOutput = 0, maxOutput = 0;
     private double integralSum = 0, lastError = 0;
     private double theresholdPercent = 0;
     private long lastTime = System.nanoTime();
 
-    public PIDFController(double Kp, double Ki, double Kd, double Kf) {
+    public PID(double Kp, double Ki, double Kd, double Kf) {
         this.Kp = Kp;
         this.Ki = Ki;
         this.Kd = Kd;
