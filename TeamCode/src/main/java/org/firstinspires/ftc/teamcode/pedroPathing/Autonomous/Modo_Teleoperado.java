@@ -75,7 +75,7 @@ public class Modo_Teleoperado extends OpMode {
             telemetry.addLine("Chassi inverso");
         }
 
-        slide(0.5);
+        slide(1);
         servoMove();
         servoClip();
         moveActuator();
@@ -127,7 +127,7 @@ public class Modo_Teleoperado extends OpMode {
 
         } else if (estadoServo == 2) {
             //pegar clip/ deixar na cesta
-            garra.setPosition(0.6);
+            garra.setPosition(0.3);
 
         } else if (estadoServo == 3) {
             //clipar

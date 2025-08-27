@@ -144,14 +144,15 @@ public class SãoPaulo_3Clips extends OpMode {
     // x = frente e tras (se for maior vai para frente)
     private final Pose startPose = new Pose(-74, -12, Math.toRadians(-180)); //posição inicial do robô
     private final Pose ClipPose = new Pose(-48, -12, Math.toRadians(-180.0)); //clipa
-    private final Pose Control1   = new Pose(-68  , -70.0 , Math.toRadians(-180.00));
-    private final Pose move2      = new Pose(-20  , -65.0 , Math.toRadians(-180.00)); //perto do sample
-    private final Pose move3      = new Pose(-10.0  , -85.0 , Math.toRadians(-180.00)); //frente do primero sample
+                                                                //mudei esse valor de 70
+    private final Pose Control1   = new Pose(-80  , -75.0 , Math.toRadians(-180.00));
+    private final Pose move2      = new Pose(-20  , -75.0 , Math.toRadians(-180.00)); //perto do sample
+    private final Pose move3      = new Pose(-10.0  , -100 , Math.toRadians(-180.00)); //frente do primero sample
     private final Pose move4      = new Pose(-83  , -100.0 , Math.toRadians(-180.00)); //empurra o primeiro sample
     private final Pose clip2      = new Pose(-47  ,  -10 , Math.toRadians(-180.00));
-    private final Pose moveX      = new Pose(-24  ,  -10, Math.toRadians(-180.00));
+    private final Pose moveX      = new Pose(-22  ,  -10, Math.toRadians(-190.00));
     private final Pose move7      = new Pose(-90  , -100 , Math.toRadians(-205.00));
-    private final Pose move8      = new Pose(-107, -100, Math.toRadians(205.00));
+    private final Pose move8      = new Pose(-106.7, -100, Math.toRadians(205.00));
     private PathChain traj1, traj2, traj4, traj5, traj6, traj7; //conjunto de trajetórias
 
 
@@ -176,13 +177,11 @@ public class SãoPaulo_3Clips extends OpMode {
                 .addPath(new BezierLine(new Point(move4), new Point(clip2)))
                 .setConstantHeadingInterpolation(Math.toRadians(-180.00))
                 .addPath(new BezierLine(new Point(clip2), new Point(moveX)))
-                .setConstantHeadingInterpolation(Math.toRadians(-180.00))
+                .setConstantHeadingInterpolation(Math.toRadians(-190))
                 .build();
 
         traj5 = follower.pathBuilder()
                 .addPath(new BezierLine(new Point(moveX), new Point(move7)))
-                .setConstantHeadingInterpolation(Math.toRadians(-205.00))
-                .addPath(new BezierLine(new Point(move7), new Point(move8)))
                 .setConstantHeadingInterpolation(Math.toRadians(-205.00))
                 .build();
 
@@ -273,7 +272,7 @@ public class SãoPaulo_3Clips extends OpMode {
             case 7:
                 follower.followPath(traj5, 0.8, true);
                 specimenPickpos();
-                setPathState(8);
+                setPathState(10);
                 break;
             case 8:
                 if(!follower.isBusy() && pathState == 8){
@@ -361,7 +360,7 @@ public class SãoPaulo_3Clips extends OpMode {
             garra.setPosition(0.0);
         }
         if (specimenpickpos == 1){
-            garra.setPosition(0.6);
+            garra.setPosition(0.7);
         }
 
         follower.update();
