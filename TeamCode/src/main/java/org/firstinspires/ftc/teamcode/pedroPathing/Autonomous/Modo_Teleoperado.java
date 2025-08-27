@@ -86,14 +86,15 @@ public class Modo_Teleoperado extends OpMode {
     }
 
     public void slide(double power){
+        int limit = -2990;
         int position = slide.getCurrentPosition();
         double control = gamepad2.left_stick_y;
-        if (control > 0){
+        if (control > 0 && position < 0){
             slide.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
             slide.setPower(power);
             holdSlide = false;
-        } else if (control < 0) {
+        } else if (control < 0 && position >= limit) {
             slide.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
             slide.setPower(-power);
