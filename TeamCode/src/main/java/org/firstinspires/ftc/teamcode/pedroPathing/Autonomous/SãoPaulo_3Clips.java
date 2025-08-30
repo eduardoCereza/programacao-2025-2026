@@ -17,7 +17,7 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.Servo;
 
-@Autonomous(name = "3 Clips")
+@Autonomous(name = "Clips - off season oficial")
 public class SãoPaulo_3Clips extends OpMode {
 
     public void clipPos(){
@@ -57,6 +57,10 @@ public class SãoPaulo_3Clips extends OpMode {
             Left.setPower(0.8);
             Right.setPower(0.8);
             holdArm = 0;
+
+            if(explode == 1){
+                break;
+            }
         }
         Left.setPower(0.0);
         Right.setPower(0.0);
@@ -72,6 +76,9 @@ public class SãoPaulo_3Clips extends OpMode {
             Left.setPower(-0.3);
             Right.setPower(-0.3);
             holdArm = 0;
+            if(explode == 1){
+                break;
+            }
         }
         Left.setPower(0.0);
         Right.setPower(0.0);
@@ -106,6 +113,9 @@ public class SãoPaulo_3Clips extends OpMode {
             slide.setMode(DcMotor.RunMode.RUN_TO_POSITION);
             slide.setPower(-1.0);
             holdSlide = 0;
+            if(explode == 1){
+                break;
+            }
         }
         slide.setPower(0.0);
         holdSlide = 1;
@@ -117,6 +127,9 @@ public class SãoPaulo_3Clips extends OpMode {
             slide.setMode(DcMotor.RunMode.RUN_TO_POSITION);
             slide.setPower(1.0);
             holdSlide = 0;
+            if(explode == 1){
+                break;
+            }
         }
         slide.setPower(0.0);
         holdSlide = 1;
@@ -129,7 +142,7 @@ public class SãoPaulo_3Clips extends OpMode {
         slide.setPower(0.1); // Aplica uma pequena potência para segurar a posição
     }
     int isopen;
-    int num;
+    int num, explode;
     int  specimenpickpos, clippos, pickpos;
     int holdSlide;
     int holdArm;
@@ -147,13 +160,12 @@ public class SãoPaulo_3Clips extends OpMode {
                                                                 //mudei esse valor de 70
     private final Pose Control1   = new Pose(-80  , -75.0 , Math.toRadians(-180.00));
     private final Pose move2      = new Pose(-20  , -75.0 , Math.toRadians(-180.00)); //perto do sample
-    private final Pose move3      = new Pose(-10.0  , -100 , Math.toRadians(-180.00)); //frente do primero sample
-    private final Pose move4      = new Pose(-83  , -100.0 , Math.toRadians(-180.00)); //empurra o primeiro sample
+    private final Pose move3      = new Pose(-10.0  , -90 , Math.toRadians(-180.00)); //frente do primero sample
+    private final Pose move4      = new Pose(-76.5  , -100.0 , Math.toRadians(-180.00)); //empurra o primeiro sample
     private final Pose clip2      = new Pose(-47  ,  -10 , Math.toRadians(-180.00));
-    private final Pose moveX      = new Pose(-22  ,  -10, Math.toRadians(-190.00));
-    private final Pose move7      = new Pose(-90  , -100 , Math.toRadians(-205.00));
-    private final Pose move8      = new Pose(-106.7, -100, Math.toRadians(205.00));
-    private PathChain traj1, traj2, traj4, traj5, traj6, traj7; //conjunto de trajetórias
+    private final Pose moveX      = new Pose(-25  ,  -10, Math.toRadians(-190.00));
+    private final Pose move7      = new Pose(-70  , -100 , Math.toRadians(-205.00));
+    private PathChain traj1, traj2, traj4, traj5; //conjunto de trajetórias
 
 
     public void buildPaths() {
@@ -186,11 +198,6 @@ public class SãoPaulo_3Clips extends OpMode {
                 .build();
 
         //off
-        traj6 = follower.pathBuilder()
-                .addPath(new BezierLine(new Point(move7), new Point(ClipPose)))
-                .setConstantHeadingInterpolation(Math.toRadians(-180.00))
-                .build();
-
     }
 
     //dependendo de como funcionar a movimentação do atuador, esses cases vão precisar ser dividos e dividir as trajetórias neles, testar antes
@@ -255,7 +262,7 @@ public class SãoPaulo_3Clips extends OpMode {
             //clipa
             case 5:
                 if (!follower.isBusy() && pathState == 5){
-                    extender(-1950);
+                    extender(-1800);
                     open();
                     num = 4;
                     setPathState(6);
@@ -382,6 +389,8 @@ public class SãoPaulo_3Clips extends OpMode {
         pickpos = 0;
         specimenpickpos = 0;
 
+        explode = 0;
+
         slide = hardwareMap.get(DcMotorEx.class, "slide");
         ponta = hardwareMap.get(Servo.class, "ponta");
         Left = hardwareMap.get(DcMotorEx.class, "Esq");
@@ -437,12 +446,7 @@ public class SãoPaulo_3Clips extends OpMode {
         clippos = 0;
         pickpos = 0;
         specimenpickpos = 0;
-        telemetry.addData("path state", pathState);
-        telemetry.addData("x", follower.getPose().getX());
-        telemetry.addData("y", follower.getPose().getY());
-        telemetry.addData("heading", follower.getPose().getHeading());
-        telemetry.addData("braço left", Left.getCurrentPosition());
-        telemetry.addData("slide position", slide.getCurrentPosition());
-        telemetry.update();
+        explode = 1;
+
     }
 }

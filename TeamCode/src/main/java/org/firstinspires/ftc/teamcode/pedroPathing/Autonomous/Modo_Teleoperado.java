@@ -28,7 +28,7 @@ public class Modo_Teleoperado extends OpMode {
         follower.setStartingPose(startPose);
 
         slide = hardwareMap.get(DcMotor.class, "slide");
-        slide.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        //slide.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         slide.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         slide.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
@@ -70,7 +70,7 @@ public class Modo_Teleoperado extends OpMode {
             telemetry.addLine("Chassi normal");
 
         } else if (estadoMove == 2) {
-            follower.setTeleOpMovementVectors(-y, -x, -turn);
+            follower.setTeleOpMovementVectors(-y, -x, turn);
             follower.update();
             telemetry.addLine("Chassi inverso");
         }
@@ -105,6 +105,12 @@ public class Modo_Teleoperado extends OpMode {
             slide.setMode(DcMotor.RunMode.RUN_TO_POSITION);
             slide.setPower(1);
             holdSlide = true;
+        }
+
+
+        //Botão reset
+        if(gamepad2.dpad_down){
+            slide.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         }
 
         telemetry.addData("Posição slide: ", position);
@@ -173,7 +179,16 @@ public class Modo_Teleoperado extends OpMode {
                 left.setPower(1);
                 right.setPower(1);
                 holdArm = true;
-            }
+        }
+
+        if (gamepad2.dpad_up){
+            left.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+            right.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        }
+
+        telemetry.addData("Posição Left: ", left.getCurrentPosition());
+        telemetry.addData("Posição Right: ", right.getCurrentPosition());
+
 
     }
 }
