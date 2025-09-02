@@ -161,7 +161,7 @@ public class SãoPaulo_3Clips extends OpMode {
     private final Pose Control1   = new Pose(-80  , -75.0 , Math.toRadians(-180.00));
     private final Pose move2      = new Pose(-20  , -75.0 , Math.toRadians(-180.00)); //perto do sample
     private final Pose move3      = new Pose(-10.0  , -90 , Math.toRadians(-180.00)); //frente do primero sample
-    private final Pose move4      = new Pose(-76.5  , -100.0 , Math.toRadians(-180.00)); //empurra o primeiro sample
+    private final Pose move4      = new Pose(-82  , -100.0 , Math.toRadians(-180.00)); //empurra o primeiro sample
     private final Pose clip2      = new Pose(-47  ,  -10 , Math.toRadians(-180.00));
     private final Pose moveX      = new Pose(-25  ,  -10, Math.toRadians(-190.00));
     private final Pose move7      = new Pose(-70  , -100 , Math.toRadians(-205.00));
@@ -262,7 +262,7 @@ public class SãoPaulo_3Clips extends OpMode {
             //clipa
             case 5:
                 if (!follower.isBusy() && pathState == 5){
-                    extender(-1800);
+                    extender(-1850);
                     open();
                     num = 4;
                     setPathState(6);
